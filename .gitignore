@@ -3,5 +3,18 @@
 **/__pycache__/
 *.pyc
 
-# Feishu doc cache
-agents-skills/feishu-doc-1.2.7/cache/
+# Node.js
+**/node_modules/
+**/package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Secrets — never commit
+*.env
+.env*

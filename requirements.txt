@@ -1,0 +1,22 @@
+# Python dependencies for skills with scripts
+# Install: pip install -r requirements.txt
+
+# wecom-chat-extractor: AES-128 decryption
+pycryptodome>=3.20.0
+
+# obsidian-ontology-sync, skill-creator: YAML parsing
+pyyaml>=6.0
+
+# microsoft-foundry: Azure AI Foundry SDK
+azure-ai-projects>=1.0.0
+azure-identity>=1.16.0
+
+# microsoft-foundry: HTTP client
+httpx>=0.27.0
+requests>=2.31.0
+
+# microsoft-foundry: OpenAI client
+openai>=1.30.0
+
+# microsoft-foundry: data processing
+pandas>=2.2.0
