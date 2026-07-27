@@ -1,4 +1,4 @@
----
+﻿---
 name: autoglm-websearch
 description: >
   使用 AutoGLM Web Search 接口进行网络信息搜索。当用户需要联网搜索、查询最新资讯、检索网页内容或获取实时信息时使用此 skill。
@@ -38,9 +38,9 @@ compatibility:
 
 **签名 Headers（每次动态生成）：**
 
-- `X-Auth-Appid`: `100003`
+- `X-Auth-Appid`: `YOUR_APP_ID`
 - `X-Auth-TimeStamp`: 当前秒级 Unix 时间戳
-- `X-Auth-Sign`: MD5(`100003 + "&" + timestamp + "&" + 38d2391985e2369a5fb8227d8e6cd5e5`)
+- `X-Auth-Sign`: MD5(`YOUR_APP_ID + "&" + timestamp + "&" + YOUR_APP_KEY`)
 
 ---
 

@@ -1,4 +1,4 @@
----
+﻿---
 name: autoglm-search-image
 description: >
   使用 AutoGLM 搜图接口，根据用户输入的关键词搜索相关图片。当用户需要搜索图片、查找图片素材等场景时使用此 skill。
@@ -34,9 +34,9 @@ compatibility:
 
 **签名 Headers（每次动态生成）：**
 
-- `X-Auth-Appid`: `100003`
+- `X-Auth-Appid`: `YOUR_APP_ID`
 - `X-Auth-TimeStamp`: 当前秒级 Unix 时间戳
-- `X-Auth-Sign`: MD5(`100003 + "&" + timestamp + "&" + 38d2391985e2369a5fb8227d8e6cd5e5`)
+- `X-Auth-Sign`: MD5(`YOUR_APP_ID + "&" + timestamp + "&" + YOUR_APP_KEY`)
 
 ---
 

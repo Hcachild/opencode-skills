@@ -1,4 +1,4 @@
----
+﻿---
 name: autoglm-deepresearch
 description: >
   对用户提出的课题进行深度研究和调研，输出结构化的深度报告。当用户需要深入了解某个话题、做行业调研、专题研究、竞品分析等场景时使用此 skill。
@@ -47,9 +47,9 @@ compatibility:
 
 两个 API 使用相同的签名 Headers：
 
-- `X-Auth-Appid`: `100003`
+- `X-Auth-Appid`: `YOUR_APP_ID`
 - `X-Auth-TimeStamp`: 当前秒级 Unix 时间戳
-- `X-Auth-Sign`: MD5(`100003 + "&" + timestamp + "&" + 38d2391985e2369a5fb8227d8e6cd5e5`)
+- `X-Auth-Sign`: MD5(`YOUR_APP_ID + "&" + timestamp + "&" + YOUR_APP_KEY`)
 
 ---
 

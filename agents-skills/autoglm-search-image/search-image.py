@@ -9,8 +9,8 @@ import json
 import urllib.request
 import urllib.error
 
-APP_ID = "100003"
-APP_KEY = "38d2391985e2369a5fb8227d8e6cd5e5"
+APP_ID = "YOUR_APP_ID"       # TODO: 填入你自己的 AutoGLM APP_ID
+APP_KEY = "YOUR_APP_KEY"      # TODO: 填入你自己的 AutoGLM APP_KEY
 URL = "https://autoglm-api.zhipuai.cn/agentdr/v1/assistant/skills/search-image"
 TOKEN_URL = "http://127.0.0.1:53699/get_token"
 

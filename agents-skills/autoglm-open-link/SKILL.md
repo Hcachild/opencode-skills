@@ -1,4 +1,4 @@
----
+﻿---
 name: autoglm-open-link
 description: >
   使用 AutoGLM Open Link 接口打开指定网页并提取页面正文内容。当用户需要读取某个网页详情、提取文章全文、抓取页面正文做摘要或分析时使用此 skill。
@@ -32,9 +32,9 @@ description: >
 
 **签名 Headers（每次动态生成）：**
 
-- `X-Auth-Appid`: `100003`
+- `X-Auth-Appid`: `YOUR_APP_ID`
 - `X-Auth-TimeStamp`: 当前秒级 Unix 时间戳
-- `X-Auth-Sign`: MD5(`100003 + "&" + timestamp + "&" + 38d2391985e2369a5fb8227d8e6cd5e5`)
+- `X-Auth-Sign`: MD5(`YOUR_APP_ID + "&" + timestamp + "&" + YOUR_APP_KEY`)
 
 ## 执行脚本
 

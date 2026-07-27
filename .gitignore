@@ -1,0 +1,7 @@
+# Cache and runtime artifacts
+**/cache/
+**/__pycache__/
+*.pyc
+
+# Feishu doc cache
+agents-skills/feishu-doc-1.2.7/cache/

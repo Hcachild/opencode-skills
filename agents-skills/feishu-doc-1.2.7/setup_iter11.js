@@ -1,7 +1,7 @@
 const { getTenantAccessToken } = require('./lib/auth');
 
-const APP_TOKEN = 'LvlAbvfzMaxUP8sGOEWcLrX7nHb';
-const TABLE_ID = 'tblLy7koY2VGXGmR'; // From inspect_meta.js
+const APP_TOKEN = 'YOUR_APP_TOKEN'; // TODO: 填入你自己的飞书文档 APP_TOKEN
+const TABLE_ID = 'YOUR_TABLE_ID';   // TODO: 填入你自己的飞书表格 TABLE_ID
 
 async function setup() {
     const token = await getTenantAccessToken();
