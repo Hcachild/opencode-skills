@@ -1,4 +1,4 @@
-﻿const { getTenantAccessToken } = require('./lib/auth');
+const { getTenantAccessToken } = require('./lib/auth');
 
 async function inspect(appToken, label) {
     const token = await getTenantAccessToken();

@@ -1,4 +1,4 @@
-﻿---
+---
 name: autoglm-open-link
 description: >
   使用 AutoGLM Open Link 接口打开指定网页并提取页面正文内容。当用户需要读取某个网页详情、提取文章全文、抓取页面正文做摘要或分析时使用此 skill。

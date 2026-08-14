@@ -1,4 +1,4 @@
-﻿---
+---
 name: autoglm-generate-image
 description: >
   使用 AutoGLM 文生图接口，根据用户输入的文字描述生成图片。当用户需要生成图片、文字转图片、AI绘图等场景时使用此 skill。

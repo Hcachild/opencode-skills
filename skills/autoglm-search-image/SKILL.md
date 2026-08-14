@@ -1,4 +1,4 @@
-﻿---
+---
 name: autoglm-search-image
 description: >
   使用 AutoGLM 搜图接口，根据用户输入的关键词搜索相关图片。当用户需要搜索图片、查找图片素材等场景时使用此 skill。

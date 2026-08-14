@@ -1,4 +1,4 @@
-﻿---
+---
 name: autoglm-websearch
 description: >
   使用 AutoGLM Web Search 接口进行网络信息搜索。当用户需要联网搜索、查询最新资讯、检索网页内容或获取实时信息时使用此 skill。

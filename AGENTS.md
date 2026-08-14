@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository contains a collection of 110 opencode agent skills. Each skill lives in `skills/<name>/SKILL.md`.
+This repository contains a collection of 112 opencode agent skills. Each skill lives in `skills/<name>/SKILL.md`.
 
 ## Conventions
 
@@ -24,9 +24,11 @@ This repository contains a collection of 110 opencode agent skills. Each skill l
 | Skill | Configuration Needed |
 |-------|---------------------|
 | `autoglm-*` | `APP_ID` and `APP_KEY` in each `.py` file |
+| `feishu-common` | `FEISHU_APP_ID` / `FEISHU_APP_SECRET` env vars or `config.json` |
 | `feishu-doc-1.2.7` | `app_id` and `app_secret` in `config.json` |
 | `feishu-chat-history` | Feishu API credentials in `references/api.md` |
 | `aminer-open-academic-1.0.5` | API key in `scripts/aminer_client.py` |
+| `foxcode-image-gen` | `YOUR_FOXCODE_API_KEY` in `scripts/generate_image.py` |
 
 ## Do Not
 
