@@ -1,6 +1,6 @@
 ---
 name: test-runner
-description: Use when writing and running tests across languages and frameworks
+description: "Use when writing and running tests across languages and frameworks"
 ---
 
 # test-runner

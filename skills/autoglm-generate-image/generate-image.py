@@ -9,7 +9,7 @@ import time
 import urllib.request
 
 # ── 配置 ──────────────────────────────────────────
-APP_ID = "YOUR_APP_ID"
+APP_ID  = "YOUR_APP_ID"
 APP_KEY = "YOUR_APP_KEY"
 URL     = "https://autoglm-api.zhipuai.cn/agentdr/v1/assistant/skills/generate-image"
 TOKEN_URL = "http://127.0.0.1:53699/get_token"

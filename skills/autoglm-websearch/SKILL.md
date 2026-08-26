@@ -38,9 +38,9 @@ compatibility:
 
 **签名 Headers（每次动态生成）：**
 
-- `X-Auth-Appid`: `YOUR_APP_ID`
+- `X-Auth-Appid`: `100003`
 - `X-Auth-TimeStamp`: 当前秒级 Unix 时间戳
-- `X-Auth-Sign`: MD5(`YOUR_APP_ID + "&" + timestamp + "&" + YOUR_APP_KEY`)
+- `X-Auth-Sign`: MD5(`100003 + "&" + timestamp + "&" + YOUR_APP_KEY`)
 
 ---
 

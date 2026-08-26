@@ -48,5 +48,5 @@ async function inspect(appToken, label) {
     // Template (Iter 10)
     await inspect('X8QPbUQdValKN7sFIwfcsy8fnEh', 'Template (Iter 10)');
     // Target (Iter 11)
-    await inspect('YOUR_APP_TOKEN', 'Target (Iter 11)');
+    await inspect('LvlAbvfzMaxUP8sGOEWcLrX7nHb', 'Target (Iter 11)');
 })();

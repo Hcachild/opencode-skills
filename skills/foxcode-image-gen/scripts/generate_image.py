@@ -6,9 +6,9 @@ Calls gpt-image-2 via the FoxCode proxy API to generate images.
 Always use this Python script instead of PowerShell to avoid UTF-8 encoding issues.
 
 Usage:
-  python generate_image.py --prompt "浣犵殑鎻愮ず璇? --output "output.png"
-  python generate_image.py --prompt "鎻忚堪..." --output "diagram.png" --size 1536x1024
-  python generate_image.py --prompt "鎻忚堪..." --output "poster.png" --size 1024x1536 --quality high
+  python generate_image.py --prompt "你的提示词" --output "output.png"
+  python generate_image.py --prompt "描述..." --output "diagram.png" --size 1536x1024
+  python generate_image.py --prompt "描述..." --output "poster.png" --size 1024x1536 --quality high
 """
 import argparse
 import base64
@@ -17,8 +17,8 @@ import os
 import sys
 import requests
 
-# 鈹€鈹€ FoxCode API Configuration 鈹€鈹€
-API_KEY = "YOUR_FOXCODE_API_KEY"  # TODO: 填入你自己的 FoxCode API key
+# ── FoxCode API Configuration ──
+API_KEY = "YOUR_FOXCODE_API_KEY"
 API_URL = "https://code.newcli.com/codex/v1/images/generations"
 MODEL = "gpt-image-2"
 
@@ -28,8 +28,8 @@ def generate_image(prompt: str, output_path: str, size: str = "1024x1024", quali
 
     # If the prompt contains Chinese, append a clarity instruction
     has_chinese = any('\u4e00' <= ch <= '\u9fff' for ch in prompt)
-    if has_chinese and "蹇呴』浣跨敤涓枃" not in prompt:
-        prompt = prompt.rstrip() + "\n\n鍥句腑鎵€鏈夋枃瀛楀繀椤讳娇鐢ㄤ腑鏂囷紝鏂囧瓧蹇呴』娓呮櫚鍙锛屼笉鑳芥湁涔辩爜銆傞厤鑹插崗璋冿紝鐣欑櫧鍏呰冻锛屾枃瀛楀眳涓竻鏅般€?
+    if has_chinese and "必须使用中文" not in prompt:
+        prompt = prompt.rstrip() + "\n\n图中所有文字必须使用中文，文字必须清晰可读，不能有乱码。配色协调，留白充足，文字居中清晰。"
 
     body = {
         "model": MODEL,
@@ -103,9 +103,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python generate_image.py --prompt "鐢讳竴鍙尗" --output cat.png
-  python generate_image.py --prompt "鏋舵瀯鍥?.." --output arch.png --size 1536x1024
-  python generate_image.py --prompt "娴锋姤..." --output poster.png --size 1024x1536 --quality high
+  python generate_image.py --prompt "画一只猫" --output cat.png
+  python generate_image.py --prompt "架构图..." --output arch.png --size 1536x1024
+  python generate_image.py --prompt "海报..." --output poster.png --size 1024x1536 --quality high
         """,
     )
     parser.add_argument("--prompt", "-p", required=True, help="Image generation prompt (Chinese or English)")

@@ -1,4 +1,4 @@
-﻿---
+---
 name: autoglm-browser-agent
 description: >-
   智能浏览器自动化代理,可执行任何需要浏览器的任务。

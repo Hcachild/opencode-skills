@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-08-26
+
+### Added
+- `aigc-down-skill`, `aigc-reduce-community` — 中文论文降 AIGC 检测率（模式分类驱动 + 实战经验）
+- `by56-wiki-embedding-reindex`, `by56-wiki-faq-update` — BaiYun 运小星知识库向量重建与 FAQ 更新
+- `cursor-chat-viewer` — 查看/搜索/导出本机 Cursor 历史对话
+- `ponytail`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help`, `ponytail-review` — minimal/lazy coding mode suite
+
+### Changed
+- Updated 50+ existing skills to match local OpenCode installations (`autoglm-*`, `feishu-*`, `wecom-chat-extractor` WeChat 4.x support, `baiyun-*`, sentry suite, matt-pocock engineering skills, etc.)
+- Skill count from 112 to 123, regenerated README index
+- Kept credentials sanitized (placeholders only, never commit secrets)
+
 ## [1.1.0] - 2026-08-14
 
 ### Added
