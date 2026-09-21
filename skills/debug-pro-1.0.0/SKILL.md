@@ -1,6 +1,6 @@
 ---
 name: debug-pro
-description: "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes"
+description: Systematic debugging methodology and language-specific debugging commands. Use when debugging, diagnosing errors, or investigating unexpected behavior.
 ---
 
 # debug-pro

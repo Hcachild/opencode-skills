@@ -1,6 +1,7 @@
 ---
 name: by56-wiki-embedding-reindex
-description: 更新 by56_wiki（BaiYun 运小星知识库）PostgreSQL/pgvector 向量库与检索索引。用于 Embedding 模型调整（换模型/换维度/服务端模型变更）后的全量向量重算、BM25 索引重建、HNSW 索引重建与验证。方法指导而非死板流程：跑向量重算时优先并发批量，动手前先探测目标 Embedding 模型是否支持批量接口（如需可联网查官方文档），若模型本身不支持批量必须向用户说明。Use when: 用户说"更新 by56_wiki 的向量库"、"Embedding Model 调整了需要重新跑索引"、"重算 embedding"、"重建向量索引"、"backfill 向量"、"换 embedding 模型"。
+description: >-
+  更新 by56_wiki（BaiYun 运小星知识库）PostgreSQL/pgvector 向量库与检索索引。用于 Embedding 模型调整（换模型/换维度/服务端模型变更）后的全量向量重算、BM25 索引重建、HNSW 索引重建与验证。方法指导而非死板流程：跑向量重算时优先并发批量，动手前先探测目标 Embedding 模型是否支持批量接口（如需可联网查官方文档），若模型本身不支持批量必须向用户说明。Use when: 用户说"更新 by56_wiki 的向量库"、"Embedding Model 调整了需要重新跑索引"、"重算 embedding"、"重建向量索引"、"backfill 向量"、"换 embedding 模型"。
 ---
 
 # by56_wiki Embedding 向量库更新

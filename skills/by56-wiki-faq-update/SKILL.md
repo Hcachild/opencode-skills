@@ -1,6 +1,7 @@
 ---
 name: by56-wiki-faq-update
-description: 更新 by56_wiki 知识库（BaiYun 运小星知识库）中的 FAQ/文档行级数据，如仓库地址、电话、收费标准等业务信息变更。通过 SSH 在 by_dev（测试）或 by_code_base（生产）上运行通用脚本 scripts/update_faq_rows.py，完成定位、DB 更新（faq_items/knowledge_chunks/documents.parsed_preview_json）、embedding 重新生成、FAQ BM25 + chunk BM25 索引重建、源 Excel 同步（自动备份）、检索与在线 MCP 验证，最后清理服务器 git 痕迹并将变更文档下载到本机。Use when: 用户说"更新知识库里的 XX 信息"、"地址/电话/收费变了需要改"、"by_dev/by_code_base 上 by56_wiki 数据要更新"，或提供业务原话要求同步到知识库。
+description: >-
+  更新 by56_wiki 知识库（BaiYun 运小星知识库）中的 FAQ/文档行级数据，如仓库地址、电话、收费标准等业务信息变更。通过 SSH 在 by_dev（测试）或 by_code_base（生产）上运行通用脚本 scripts/update_faq_rows.py，完成定位、DB 更新（faq_items/knowledge_chunks/documents.parsed_preview_json）、embedding 重新生成、FAQ BM25 + chunk BM25 索引重建、源 Excel 同步（自动备份）、检索与在线 MCP 验证，最后清理服务器 git 痕迹并将变更文档下载到本机。Use when: 用户说"更新知识库里的 XX 信息"、"地址/电话/收费变了需要改"、"by_dev/by_code_base 上 by56_wiki 数据要更新"，或提供业务原话要求同步到知识库。
 ---
 
 # by56_wiki FAQ 数据更新

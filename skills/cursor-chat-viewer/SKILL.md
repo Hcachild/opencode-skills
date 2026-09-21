@@ -1,6 +1,7 @@
 ---
 name: cursor-chat-viewer
-description: 查看本机 Cursor 的历史对话记录（Agent/Composer 会话）。从 Cursor 的本地 SQLite 数据库（state.vscdb）直接读取，支持按 Agent ID 查看完整对话、按关键词搜索、导出为文件。Use when: (1) 用户给了一个 Cursor Agent ID 想知道里面聊了什么, (2) 想查 Cursor 里的历史对话/聊天记录, (3) 想搜索 Cursor 会话里的某个关键词, (4) 想导出某个 Cursor 对话为文本/JSON。触发词: Cursor 对话、Cursor 聊天记录、Agent ID、cursor chat、查对话、导出对话。
+description: >-
+  查看本机 Cursor 的历史对话记录（Agent/Composer 会话）。从 Cursor 的本地 SQLite 数据库（state.vscdb）直接读取，支持按 Agent ID 查看完整对话、按关键词搜索、导出为文件。Use when: (1) 用户给了一个 Cursor Agent ID 想知道里面聊了什么, (2) 想查 Cursor 里的历史对话/聊天记录, (3) 想搜索 Cursor 会话里的某个关键词, (4) 想导出某个 Cursor 对话为文本/JSON。触发词: Cursor 对话、Cursor 聊天记录、Agent ID、cursor chat、查对话、导出对话。
 ---
 
 # Cursor Chat Viewer

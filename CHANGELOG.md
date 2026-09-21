@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-21
+
+### Added
+- `audit-security`, `fight-repo-rot`, `manage-assets`, `manage-secrets-env`, `project-conventions`, `refactor-verify`, `setup-ci`, `ship-cycle`, `unify-design`, `vibesubin`, `write-for-ai` — code-hygiene / engineering specialist suite
+- `codex-fix`, `codebase-conventions`, `skill-doctor`, `perf-goal-fill` — review-fix loop, code conventions, skill iteration ledger, performance goal writing
+
+### Changed
+- Updated 9 skills to match local OpenCode state: `a-stock-analysis-1.0.0`, `bugfix-workflow`, `by56-wiki-embedding-reindex`, `by56-wiki-faq-update`, `cursor-chat-viewer`, `debug-pro-1.0.0`, `feishu-drive-1.0.0`, `test-runner-1.0.0`, `microsoft-foundry` (2026-09 upstream refresh)
+- Skill count from 123 to 138, regenerated README index
+- Kept credentials sanitized (placeholders only): kept repo versions for `autoglm-*`, `foxcode-image-gen` and `feishu-doc-1.2.7/config.json`; excluded `autoglm-browser-agent/dist` binaries
+
 ## [1.2.0] - 2026-08-26
 
 ### Added
