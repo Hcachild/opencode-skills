@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-29
+
+### Added
+- `resume-tailor` — 按 JD 定制简历（严格防编造 + 去 AI 腔写作规范），支持 `.resume/` 数据目录、work-history profile 持久化与匹配度分析（改编自 Proficiently 开源技能，MIT）
+- `resume-builder` — Harvard 标准 + ATS 友好的简历创建/改写/格式化/翻译，含 .docx + 文本型 PDF 交付流程（python-docx → docx2pdf → pypdf 校验）（改编自 dabydat/resume-builder-skill，MIT）
+- `interview-prep-generator` — STAR 故事库、高频面试题预测、自我介绍脚本、反问清单与困难问题应对（源自 Paramchoudhary/ResumeSkills，MIT）
+- `salary-negotiation-prep` — 市场薪资调研、总包计算、counter-offer 邮件/电话话术、竞争 offer 对比（源自 Paramchoudhary/ResumeSkills，MIT）
+
+### Changed
+- Skill count from 139 to 143, regenerated README index
+- `requirements.txt`: added `python-docx` / `docx2pdf` / `pypdf` for resume-builder document generation
+- Kept credentials sanitized (placeholders only, never commit secrets)
+
 ## [1.4.0] - 2026-09-29
 
 ### Added

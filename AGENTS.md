@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository contains a collection of 139 opencode agent skills. Each skill lives in `skills/<name>/SKILL.md`.
+This repository contains a collection of 143 opencode agent skills. Each skill lives in `skills/<name>/SKILL.md`.
 
 ## Conventions
 
