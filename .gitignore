@@ -18,3 +18,6 @@ Thumbs.db
 # Secrets — never commit
 *.env
 .env*
+
+# Runtime token cache (feishu-common)
+skills/memory/

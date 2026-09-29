@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-29
+
+### Added
+- `feishu-wiki-export` — 递归导出飞书（Lark）知识库/Wiki 为本地 Markdown 完整备份（blocks→md、图片/附件、表格、Mermaid、旧版 doc / sheet 节点），将个人飞书知识库全量导出流程沉淀为技能
+
+### Changed
+- Updated `microsoft-foundry` to upstream v1.2.22 → v1.2.26: 本地运行适配 `pyproject.toml` / `uv.lock`（venv 就近服务目录解析、私有索引 re-lock 指引、运行进程退出即停止轮询）；preset 部署成本估算改用独立 `azure-cost` 插件；校验规则 1.2.0 → 1.3.0（新增 AUTH-001 / IMG-001 / NET-001 等）
+- Skill count from 138 to 139, regenerated README index
+- Kept credentials sanitized (placeholders only, never commit secrets); ignored feishu-common runtime token cache under `skills/memory/`
+
 ## [1.3.0] - 2026-09-21
 
 ### Added
