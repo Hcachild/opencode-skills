@@ -113,5 +113,7 @@ generation          < state.budget.max_generations    （如 300）
 1. `state.json`（generation/status/计数）与 `agent_log.jsonl` 尾部对齐；
 2. `runs/` 中无 NOTES 的目录 = 在途任务；`claims/*` 与之一一对应；
 3. 残留 `locks/*`：内容 agent 已消亡 → `.stale` 清理；
-4. opencode 会话库定位 root/在途子代理；能续跑则续跑，否则发"恢复 root"（带关键事实、禁止重跑已完成项）；
+4. **恢复 Task Agent 对话优先、消息极简**：用原 `task_id` 续跑同一子代理会话，
+   prompt 只需 "继续"（非必要不发大段背景/规格）；嵌套链由各级自己逐级恢复；
+   仅当会话不可恢复时，才发重建 brief（最少事实 + 声明已完成项无需重跑）；
 5. 完成后补 leaderboard/state/checkpoint，再启动下一代。

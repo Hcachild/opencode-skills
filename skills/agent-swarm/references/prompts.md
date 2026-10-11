@@ -85,6 +85,10 @@ lead 汇总：<tracks/<TASK>/candidates.csv + NOTES.md；变体选择规则（�
 - green 判定：<指标阈值 + CI + 技能门>
 - 对照要求：<回归均值/平凡基线/泄漏敏感性>
 
+批量同构工作：若本任务是"逐条处理大量同构数据"（成千上万条 classify/extract/打标），
+可加载批量处理 skill（如 `parallel-data-processing`）按其"切 N 片→每片一个 worker→校验合并 JSON"模式执行，
+一个 manager 挂 N 个 worker 即可，不必为每条单开子任务。
+
 硬规则：<同上：不改既有文件/新增脚本路径/产物落位/不 git/raw 只读/test 单次登记/抢槽/append_jsonl/预算>。
 
 【worker 规格】
@@ -112,25 +116,32 @@ NOTES.md 必含：目标 / 数据版本 / 命令 / 结果（主指标+CI+prevale
 【回报 manager】≤40 行。
 ```
 
-## §5 恢复 root（会话中断后）
+## §5 恢复 Task Agent 对话（中断后）
+
+**首选：极简续跑。** 用原 `task_id` 恢复同一子代理会话，prompt 只写：
 
 ```
-你（swarm<N> root curator，Generation <G>）之前被意外中断。sponsor 已完成现场核查，情况如下：
+继续
+```
 
-## 关键事实（无需重跑）
-- <已完成的实验及其最终数字/产物路径，逐条列出>
-- <在途/未完成任务及其现场状态>
-- 现场残留：<claims/locks/state 状态>
+- 它保留完整上下文（目标/规格/纪律/已做工作），自己知道做到哪、下一步是什么。
+- **非必要不要回复一大堆话**：不要重发背景、规格、纪律或已完成事实——浪费 token，还可能打乱它的判断。
+- 只在需要纠偏/补充关键约束时加最少一句，例如：
+  - `继续；先完成收尾（NOTES/登记），再回报。`
+  - `继续；不要重跑已完成的 <X>，直接从 <Y> 接着做。`
 
-## 你的任务（恢复本代并收尾）
-1. 恢复嵌套子代理：检查此前派生的子代理是否有未完成/中断的（尤其 <方向>）。
-   能拿到原会话的直接续跑；否则按下列信息重建 prompt 重新派发（任务互斥、指纹防重）：
-   一级：<session id / agent_id 列表>
-2. 清理残留 claims/locks（`.stale` 后重建）；核对 registry/test_uses 无重复消耗。
-3. 完成收尾：leaderboard/state/checkpoint/docs 记录；若达标 → STOP + REPRODUCE 清单。
-4. 回报 sponsor ≤40 行。
+**嵌套链**：root 恢复后，让 root 用同样方式（对它的子代理说"继续"）逐级恢复；
+sponsor 不要越过 root 逐条重建所有子代理。
 
+**兜底（仅当原会话/task_id 不可恢复时）**：发重建 brief，只附最少必要事实，并声明"已完成项无需重跑"：
+
+```
+你是 <项目> swarm<N> root curator（Generation <G>），之前被意外中断，继续收尾。
+- 已完成（无需重跑）：<逐条：实验/数字/产物路径>
+- 在途/未完成：<现场状态>
+- 收尾要求：<leaderboard/state/checkpoint/登记/STOP 判定>
 纪律不变：预注册、test 单次、技能门、预算硬闸、绝对路径。
+回报 ≤40 行。
 ```
 
 ## §6 嵌套能力验证（配置后一次性）

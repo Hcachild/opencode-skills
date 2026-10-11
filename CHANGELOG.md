@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-10-11
+
+### Changed
+- Updated `agent-swarm` — 中断恢复改为优先续跑原 Task Agent 会话：用原 `task_id` + 仅 "继续" 的极简 prompt，嵌套链逐级恢复；仅当会话不可恢复时才发重建 brief（SKILL.md / `references/protocol.md` / `references/prompts.md` §5 同步）
+- Updated `agent-swarm` — 新增「与批量处理 skill 协同」：成千上万条同构数据直接套用 `parallel-data-processing` 的「切 N 片 → 每片一个 worker → 校验合并」模式（一个 manager 挂 N 个 worker），不必为每条单开子任务
+- Skill count unchanged at 148
+
 ## [1.6.0] - 2026-10-11
 
 ### Added

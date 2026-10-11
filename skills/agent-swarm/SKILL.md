@@ -33,6 +33,8 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 - **重计算**另受物理槽限制（`locks/heavy_XX`，按机器核数定，如 ≤16），与代理并发无关
 - root 上下文将满时派生**继任 root**接棒（写 checkpoint、深度+1）
 
+**与批量处理 skill 协同**：若已安装批量处理 skill（如 `parallel-data-processing`），对**扁平的大批量同构工作**（逐条分类/提取/打标成千上万条数据）直接采用它的"切 N 片 → 每片一个 Task Agent 输出 JSON → 校验合并"模式（一个 manager 挂 N 个 worker 即可），不必为每个小项单开 track；层级 swarm 仍负责研究主线与治理。
+
 ## 一次性基建（每个研究目标一套）
 
 1. **配置子代理**（全局/项目 `opencode.json`，片段见 `references/templates.md` §1）：
@@ -76,9 +78,13 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 
 ## 恢复被中断的 swarm
 
-1. **盘点现场**：`state.json`、`agent_log.jsonl` 尾部、`runs/` 新增目录、`claims/*.claim`、`locks/*.lock`、`STOP`。
-2. **定位会话**：在 opencode 会话库找 root 及在途子代理（标题含 swarm 名 / `@swarm-lead subagent`）；能拿到 task_id 的直接**续跑原会话**，拿不到的 spawn 一个"恢复 root"（prompt 见 `references/prompts.md` §5，带关键事实并声明"无需重跑"）。
-3. **清理与收尾**：清残留 claims/locks，补齐 checkpoint/leaderboard/state，完成在途任务卡，再继续下一代。
+1. **盘点现场**（只读）：`state.json`、`agent_log.jsonl` 尾部、`runs/` 新增目录、`claims/*.claim`、`locks/*.lock`、`STOP`。
+2. **恢复 Task Agent 对话（首选、极简）**：
+   - 用原 `task_id` 恢复同一子代理会话，prompt 就一句 **"继续"**——它的上下文还在，自己知道做到哪、下一步是什么；**非必要不要回复一大堆话**（重发背景/规格浪费 token，还可能打乱它）。
+   - 只在需要纠偏/补充约束时加最少一句（如 `继续；先收尾再回报`）。
+   - **嵌套链逐级恢复**：root 恢复后，让 root 用同样方式（"继续"）恢复它派生的 lead/manager/worker；sponsor 不要替 root 重写整套 brief。
+   - 兜底：仅当原会话/task_id 不可恢复时，才发重建 brief（`references/prompts.md` §5 兜底模板，只附最少必要事实、声明"已完成项无需重跑"）。
+3. **清理与收尾**：清残留 claims/locks（`.stale` 后重抢），补齐 checkpoint/leaderboard/state，完成在途任务卡，再继续下一代。
 
 ## 常见坑
 
@@ -88,6 +94,7 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 - 假 STOP：高流行度队列的 F1 是伪影——技能门 + 同队列平凡基线可拦截。
 - 不抢槽直接上重训练 → 机器过载、任务互相拖死。
 - 每代只汇报数字不落盘 → 无法恢复/复现；NOTES + checkpoint 是硬契约。
+- 恢复时重发大段 brief → 浪费 token 还可能打乱子代理；优先对原会话说"继续"。
 - 一开始就拉满预算 → 先跑 1–2 代观测真实成本与产出价值，再决定加码（**价值耗尽可能早于预算耗尽**）。
 
 ## 配套文件
