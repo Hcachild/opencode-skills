@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-10-11
+
+### Added
+- `agent-swarm` — 嵌套子代理长跑研究集群：sponsor → root curator → track-lead → manager → worker 树状结构，CHARTER/PROTOCOL/ROADMAP 治理、backlog/leaderboard/checkpoint 运行时、指纹与测试注册、预算门与 STOP 规则
+- `codex-ppt` — 从文章/报告/论文/笔记/大纲生成视觉统一的图块式 PPT/PPTX（风格库、幻灯片子代理生成、质量门与组装流程）
+- `deep-web-research` — 多轮深度联网搜索/找东西/查证（线索中断时向用户追问澄清；不适用于一次性简单查询）
+- `fanqie-image-restore` — 番茄图片混淆/小番茄加密图还原（Gilbert 空间曲线、块混淆、逐像素/行像素混淆）
+- `ppt-design-skill` — 基于 pptx-designer 库的可编辑 PPT 设计/生成/视觉审查/迭代（brief → PPTX → PDF → PNG 工作流）
+
+### Changed
+- Skill count from 143 to 148, regenerated README index
+- `requirements.txt`: added `python-pptx` / `Pillow` / `filelock` (codex-ppt) and `pptx-designer` (ppt-design-skill)
+- Kept credentials sanitized (placeholders only, never commit secrets); excluded `__pycache__`/`.pyc`; Claude Code `openai.yaml` kept in `misc/openai-yaml/`
+
 ## [1.5.0] - 2026-09-29
 
 ### Added
