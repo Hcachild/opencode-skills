@@ -1,22 +1,34 @@
 # by56_wiki 环境速查
 
+> 2026-10-13 核验：`by_production` 上已部署并运行 by56_wiki（原「无 by56_wiki」的说法已过时）；`by_code_base` 的服务未运行、仅保留代码目录。
+
 ## 服务器
 
-| 环境 | SSH 主机 | 用途 | by56_wiki 路径 | MCP 端口 |
+| 环境 | SSH 主机 | 用途 | by56_wiki 服务 | MCP 端口 |
 |---|---|---|---|---|
-| 测试 | `by_dev` | 测试知识库 | `/root/workspace/by56_wiki` | 10096 |
-| 生产 | `by_code_base` | 正式知识库 | `/root/workspace/by56_wiki` | 10096 |
-| 正式外层 | `by_production` | BaiYun_Agent（无 by56_wiki） | - | - |
+| 测试 | `by_dev` | 测试知识库 | 运行中（`.venv/bin/uvicorn ... --port 10096`） | 10096 |
+| 生产（主用） | `by_production` | 正式知识库（含数据标注/审核平台） | 运行中（同上） | 10096 |
+| 旧生产实例 | `by_code_base` | 代码目录保留（HEAD 较旧），服务未运行、10096 未监听 | — | — |
 
+- 三台机器均有一份 `/root/workspace/by56_wiki`；`by_production` 检出较新（#253 已合入，HEAD c380e5d），`by_code_base` 停留旧提交（HEAD 0603a7c），改动前先 `git log` 对照。
+- `by_production` 与 `by_code_base` 的 `.env` 均指向生产 RDS `pgm-wz91ayr9l1m1fld8...`（同库）；`by_dev` 指向测试 RDS `pgm-wz9j75t19vqr2108...`。
+- `by_production` 上同时运行其他项目（SmartInquiry 9527、cs-invoice-parse 8080 等），勿误停。
 - venv：`.venv/bin/python`（项目根目录下运行，`app.core.config` 自动加载 `.env`，勿手动重复加载）。
 - 服务进程：`ps aux | grep uvicorn.*10096`。
 
-## 数据库（各自独立的 RDS）
+## 数据标注 / 审核数据（生产库，只读）
+
+- 审核记录在**生产库**的 `qa_review_items` / `qa_review_batches`：状态机 `pending → review → approved / modified（均展示「已通过」）/ rejected`；标注平台的「待审核 50 / 已通过 50」即这张表。
+- 常用字段：`tool`（业务场景：product_compliance_check / knowledge_chat / product_hscode_search / transport_channel_check）、`change_type`（add/modify/disable）、`question / answer / original_answer`、`original_input_json / corrected_input_json`、`issue_type`（correct/incorrect/missing）、`resolution_action`、`comment`、`annotator / reviewer`。
+- 只读导出：脚本 scp 到服务器 `/tmp` 后执行 `ssh by_production "cd /root/workspace/by56_wiki && .venv/bin/python /tmp/xxx.py"`。
+- 坑：`original_input_json` 等为 `json` 类型，比较/去重要 `::text` 转型（`json` 不支持 `=` / `IS DISTINCT FROM`）。
+
+## 数据库（RDS）
 
 | 环境 | RDS 主机（脱敏） |
 |---|---|
-| by_dev | `pgm-wz9j75t19vqr2108.pg.rds.aliyuncs.com` |
-| by_code_base | `pgm-wz91ayr9l1m1fld8.pg.rds.aliyuncs.com` |
+| by_dev（测试） | `pgm-wz9j75t19vqr2108.pg.rds.aliyuncs.com` |
+| by_production / by_code_base（生产，同库） | `pgm-wz91ayr9l1m1fld8.pg.rds.aliyuncs.com` |
 
 - URL 在 `.env` 的 `KB_DATABASE_URL`（`postgresql+psycopg://`），psycopg v3。
 - 连库脚本模板（scp 到 /tmp 执行，避免 PowerShell 引号问题）：

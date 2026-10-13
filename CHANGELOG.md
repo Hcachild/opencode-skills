@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-10-13
+
+### Added
+- `doc-coauthoring` — 结构化文档共创工作流（Context Gathering → Refinement & Structure → Reader Testing），引导用户高效传递上下文、迭代内容并做读者验证
+- `humanizer` — 去除 AI 写作痕迹的文本改写（not-X-but-Y 对仗、单句收尾、三段式排比、夸张措辞等 AI tells；基于 Wikipedia "Signs of AI writing"）
+- `opencode-chat-viewer` — 查看/搜索/导出本机 OpenCode 历史对话（opencode.db 的 session/message/part 三表，只读；支持按日期列会话、按 ID/标题查看、关键词搜索、批量导出）
+- `pretty-mermaid` — Mermaid 图渲染为带主题的 SVG/PNG 或 ASCII/Unicode 终端图（flowchart/sequence/state/class/ERD/XY chart，15 个内置主题；依赖 beautiful-mermaid + @resvg/resvg-js）
+- `tapd-work-recording` — 把日报/纪要/对话记录转成 TAPD 任务卡并经 MCP 建卡、复核、补工时（容器落位、字段映射、HTML 描述格式、工时填报规范等实战要点）
+
+### Changed
+- Updated `microsoft-foundry` 1.2.26 → 1.2.28 — 部署文档补充私有 PyPI 索引导致 `azd deploy` 失败的排障指引（改用公共索引 re-lock 或导出 pinned requirements.txt）
+- Updated `by56-wiki-faq-update` — 环境速查更新：by_production 为主用生产（by56_wiki 已部署运行）、by_code_base 仅保留旧代码目录；补充数据标注/审核表结构（qa_review_items / qa_review_batches）与导出方法
+- Skill count from 148 to 153, regenerated README index
+- `pretty-mermaid` 运行前需在其目录 `npm install`；不提交 `node_modules` / `package-lock.json`
+- Kept credentials sanitized (placeholders only, never commit secrets)
+
 ## [1.6.1] - 2026-10-11
 
 ### Changed

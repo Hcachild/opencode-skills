@@ -1,6 +1,6 @@
 # opencode-skills
 
-Personal collection of 148 opencode agent skills.
+Personal collection of 153 opencode agent skills.
 
 ## Quick Start
 
@@ -70,6 +70,13 @@ cd skills/feishu-doc-1.2.7
 npm install --production
 ```
 
+The `pretty-mermaid` skill also requires Node.js packages (not installed automatically):
+
+```bash
+cd skills/pretty-mermaid
+npm install
+```
+
 ## Skills Requiring Configuration
 
 After installation, fill in credentials for these skills:
@@ -84,7 +91,7 @@ After installation, fill in credentials for these skills:
 
 ```
 opencode-skills/
-├── skills/              # 148 skill directories
+├── skills/              # 153 skill directories
 ├── install.sh           # macOS/Linux installer
 ├── install.ps1          # Windows installer
 ├── Makefile             # Build/install/validate commands
@@ -98,7 +105,7 @@ opencode-skills/
 └── README.md            # This file
 ```
 
-## Skill Index (148 skills)
+## Skill Index (153 skills)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -144,110 +151,115 @@ opencode-skills/
 | 40 | [deep-web-research](skills/deep-web-research) | Use when the user asks to 联网搜索/查找/找出 an unknown thing (game, app, product, video, song, article, per... |
 | 41 | [design-an-interface](skills/design-an-interface) | Generate multiple radically different interface designs for a module using parallel sub-agents. Use ... |
 | 42 | [diagnosing-bugs](skills/diagnosing-bugs) | Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug t... |
-| 43 | [documentation-and-adrs](skills/documentation-and-adrs) | 记录技术决策及其背景、约束、备选方案和取舍，并维护架构决策记录、公共 API 文档、README、变更日志与面向开发代理的项目规则。适用于作出重要架构决策、比较竞争方案、新增或修改公共接口、发布影响用... |
-| 44 | [domain-modeling](skills/domain-modeling) | Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology o... |
-| 45 | [edit-article](skills/edit-article) | Edit and improve articles by restructuring sections, improving clarity, and tightening prose. Use wh... |
-| 46 | [executing-plans](skills/executing-plans-0.1.0) | Use when you have a written implementation plan to execute in a separate session with review checkpo... |
-| 47 | [fanqie-image-restore](skills/fanqie-image-restore) | Restore 混淆图/加密图 from 番茄图片混淆/小番茄 (fanqie/tomato) apps, including 空间曲线混淆(Gilbert curve)、块混淆、逐像素/行像素混淆.... |
-| 48 | [feishu-chat-history](skills/feishu-chat-history) | Fetch and summarize Feishu group chat history. Use when the user asks to read, review, or summarize ... |
-| 49 | [feishu-common](skills/feishu-common) | Shared Feishu (Lark) auth library for feishu-* skills. Provides tenant_access_token caching and auth... |
-| 50 | [feishu-cron-reminder](skills/feishu-cron-reminder) | Create cron jobs that reliably deliver reminders to Feishu (飞书) chats. Use when the user asks to set... |
-| 51 | [feishu-doc](skills/feishu-doc-1.2.7) | Fetch content from Feishu (Lark) Wiki, Docs, Sheets, and Bitable. Automatically resolves Wiki URLs t... |
-| 52 | [feishu-drive](skills/feishu-drive-1.0.0) | 飞书云空间文件管理 Skill。上传/下载/移动/搜索文件、创建文件夹、获取元数据等。当需要管理飞书云空间中的文件和文件夹时使用此 Skill。 |
-| 53 | [feishu-perm](skills/feishu-perm) | Feishu permission management for documents and files. Activate when user mentions sharing, permissio... |
-| 54 | [feishu-screenshot](skills/feishu-screenshot) | Capture macOS screenshots and send to Feishu. Use when the user asks to take a screenshot and share ... |
-| 55 | [feishu-send-file](skills/feishu-send-file) | Send files to a Feishu group or user via REST API. Use when the user explicitly asks to send a file,... |
-| 56 | [feishu-wiki-export](skills/feishu-wiki-export) | 递归导出飞书（Lark）知识库/Wiki 为本地 Markdown 完整备份，含图片、附件、表格、Mermaid 图表与层级目录。与 feishu-doc（单篇读写）互补，面向整棵树批量导出。Use when：用户说"导出飞书文档、导... |
-| 57 | [FFmpeg Video Editor](skills/ffmpeg-video-editor-1.0.0) | Generate FFmpeg commands from natural language video editing requests - cut, trim, convert, compress... |
-| 58 | [fight-repo-rot](skills/fight-repo-rot) | Finds what's rotting in a repo and returns a prioritized diagnosis — dead code first, then god files... |
-| 59 | [find-skills](skills/find-skills) | Helps users discover and install agent skills when they ask questions like "how do I do X", "find a ... |
-| 60 | [foxcode-image-gen](skills/foxcode-image-gen) | Generate high-quality images via the FoxCode gpt-image-2 API. Use when the user asks to generate, cr... |
-| 61 | [frontend-design](skills/frontend-design-3-0.1.0) | Create distinctive, production-grade frontend interfaces with high design quality. Use this skill wh... |
-| 62 | [git-essentials](skills/git-essentials-1.0.0) | Essential Git commands and workflows for version control, branching, and collaboration. |
-| 63 | [git-guardrails-claude-code](skills/git-guardrails-claude-code) | Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.... |
-| 64 | [grill-me](skills/grill-me) | A relentless interview to sharpen a plan or design. |
-| 65 | [grill-with-docs](skills/grill-with-docs) | A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as ... |
-| 66 | [grilling](skills/grilling) | Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test ... |
-| 67 | [handoff](skills/handoff) | Compact the current conversation into a handoff document for another agent to pick up. |
-| 68 | [implement](skills/implement) | Implement a piece of work based on a spec or set of tickets. |
-| 69 | [improve-codebase-architecture](skills/improve-codebase-architecture) | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill throug... |
-| 70 | [interview-designer](skills/interview-designer-1.0.0) | Analyze resumes and design interview strategies using evidence-based methodology. Transforms intervi... |
-| 71 | [interview-prep-generator](skills/interview-prep-generator) | Use when the user is preparing for a job interview, practicing behavioral questions, or wants STAR s... |
-| 72 | [loop-me](skills/loop-me) | Grill me about specs for the workflows I want to build, within this workspace. |
-| 73 | [manage-assets](skills/manage-assets) | Finds oversized files, binary bloat, and accidental artifact commits in a repo — large files current... |
-| 74 | [manage-secrets-env](skills/manage-secrets-env) | Opinionated defaults and full lifecycle playbook for secrets and environment variables. Decides wher... |
-| 75 | [Market Research](skills/market-research-1.0.0) | Size markets, analyze competitors, and validate opportunities with practical frameworks and free dat... |
-| 76 | [Memory](skills/memory-1.0.2) | Infinite organized memory that complements your agent's built-in memory with unlimited categorized s... |
-| 77 | [microsoft-foundry](skills/microsoft-foundry) | Build, deploy, evaluate, optimize, fine-tune, and manage Microsoft Foundry agents, models, and resou... |
-| 78 | [migrate-to-shoehorn](skills/migrate-to-shoehorn) | Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions s... |
-| 79 | [obsidian-ontology-sync](skills/obsidian-ontology-sync-1.0.1) | Bidirectional sync between Obsidian PKM (human-friendly notes) and structured ontology (machine-quer... |
-| 80 | [obsidian-vault](skills/obsidian-vault) | Search, create, and manage notes in the Obsidian vault with wikilinks and index notes. Use when user... |
-| 81 | [opencode-controller](skills/opencode-controller-1.0.0) | Control and operate Opencode via slash commands. Use this skill to manage sessions, select models, s... |
-| 82 | [parallel-data-processing](skills/parallel-data-processing) | 精细化批量数据处理通用工作流。当需要对大量结构化数据逐条进行精细处理（分类、审核、翻译、改写、信息提取、打标、清洗、校验等）时使用，例如"把这些FAQ逐条分类"、"给这1万条记录逐条打标签"、"逐条翻... |
-| 83 | [perf-goal-fill](skills/perf-goal-fill) | Fill ??????????/???and??????in a human, goal-not-result style. Use when filling ?????, ??/??, ????, ... |
-| 84 | [ponytail](skills/ponytail) | Forces the laziest solution that actually works, simplest, shortest, most minimal. Channels a senior... |
-| 85 | [ponytail-audit](skills/ponytail-audit) | Whole-repo audit for over-engineering. Like ponytail-review, but scans the entire codebase instead o... |
-| 86 | [ponytail-debt](skills/ponytail-debt) | Harvest every `ponytail:` comment in the codebase into a debt ledger, so the deliberate shortcuts an... |
-| 87 | [ponytail-gain](skills/ponytail-gain) | Show ponytail's measured impact as a compact scoreboard: less code, less cost, more speed, from the ... |
-| 88 | [ponytail-help](skills/ponytail-help) | Quick-reference card for all ponytail modes, skills, and commands. One-shot display, not a persisten... |
-| 89 | [ponytail-review](skills/ponytail-review) | Code review focused exclusively on over-engineering. Finds what to delete: reinvented standard libra... |
-| 90 | [ppt-design-skill](skills/ppt-design-skill) | Design, generate, review, and revise editable PowerPoint presentations through a rigorous brief-to-P... |
-| 91 | [project-conventions](skills/project-conventions) | Opinionated defaults for the lower-stakes structural conventions every project has to pick — branch ... |
-| 92 | [prototype](skills/prototype) | Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whe... |
-| 93 | [qa](skills/qa) | Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHu... |
-| 94 | [refactor-verify](skills/refactor-verify) | Proves a behavior-preserving code change (refactor, rename, split, merge, extract, inline, or delete... |
-| 95 | [request-refactor-plan](skills/request-refactor-plan) | Create a detailed refactor plan with tiny commits via user interview, then file it as a GitHub issue... |
-| 96 | [research](skills/research) | Investigate a question against high-trust primary sources and capture the findings as a Markdown fil... |
-| 97 | [research-paper-writer](skills/research-paper-writer-0.1.0) | Creates formal academic research papers following IEEE/ACM formatting standards with proper structur... |
-| 98 | [resolving-merge-conflicts](skills/resolving-merge-conflicts) | Use when you need to resolve an in-progress git merge/rebase conflict. |
-| 99 | [resume-builder](skills/resume-builder) | Use when the user wants to create, improve, optimize, review, rewrite, format, or translate a resume... |
-| 100 | [resume-tailor](skills/resume-tailor) | Use when the user wants their existing resume tailored or customized for a specific job posting (JD)... |
-| 101 | [salary-negotiation-prep](skills/salary-negotiation-prep) | Use when the user has a job offer and wants to negotiate salary, research market compensation, write... |
-| 102 | [scaffold-exercises](skills/scaffold-exercises) | Create exercise directory structures with sections, problems, solutions, and explainers that pass li... |
-| 103 | [security-auditor](skills/security-auditor-1.0.0) | Use when reviewing code for security vulnerabilities, implementing authentication flows, auditing OW... |
-| 104 | [Self-Improving Agent (With Self-Reflection)](skills/self-improving-1.1.3) | Self-reflection + Self-criticism + learning from corrections. Agent evaluates its own work, catches ... |
-| 105 | [sentry-create-alert](skills/sentry-create-alert) | Create Sentry alerts using the workflow engine API. Use when asked to create alerts, set up notifica... |
-| 106 | [sentry-debug-issue](skills/sentry-debug-issue) | Debug and fix a Sentry issue — find it (by link, ID, or search), pull full context (stack trace, bre... |
-| 107 | [sentry-fix-stack-traces](skills/sentry-fix-stack-traces) | Make Sentry stack traces readable — upload source maps for JavaScript/TypeScript, or debug files for... |
-| 108 | [sentry-get-started](skills/sentry-get-started) | Guided entry point for using Sentry through your agent. Orients you to your current setup and, for a... |
-| 109 | [sentry-instrument](skills/sentry-instrument) | Instrument an application with Sentry — detect the platform, install and initialize the SDK if neede... |
-| 110 | [sentry-otel-exporter-setup](skills/sentry-otel-exporter-setup) | Configure the OpenTelemetry Collector with Sentry Exporter for multi-project routing and automatic p... |
-| 111 | [sentry-setup-releases](skills/sentry-setup-releases) | Set up Sentry releases and deploy tracking — tag events with a version and environment, create the r... |
-| 112 | [sentry-snapshots-cocoa](skills/sentry-snapshots-cocoa) | Full Sentry Snapshots setup for Apple/Cocoa projects. Use when asked to "setup SnapshotPreviews", "s... |
-| 113 | [SEO (Site Audit + Content Writer + Competitor Analysis)](skills/seo-1.0.3) | SEO specialist agent with site audits, content writing, keyword research, technical fixes, link buil... |
-| 114 | [seo-content-writer](skills/seo-content-writer-2.0.0) | Use when the user asks to "write SEO content", "create a blog post", "write an article", "content wr... |
-| 115 | [session-logs](skills/session-logs-1.0.0) | Search and analyze your own session logs (older/parent conversations) using jq. |
-| 116 | [setup-ci](skills/setup-ci) | Teaches CI/CD from first principles to a non-developer, then scaffolds a working test + deploy pipel... |
-| 117 | [setup-matt-pocock-skills](skills/setup-matt-pocock-skills) | Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, ... |
-| 118 | [setup-pre-commit](skills/setup-pre-commit) | Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current r... |
-| 119 | [setup-ts-deep-modules](skills/setup-ts-deep-modules) | Wire dependency-cruiser into a TypeScript repo so each package is a deep module — implementation hid... |
-| 120 | [ship-cycle](skills/ship-cycle) | Issue-driven development orchestrator. Turns improvement intent into a well-specified, bilingual iss... |
-| 121 | [skill-creator](skills/skill-creator-0.1.0) | Guide for creating effective skills. This skill should be used when users want to create a new skill... |
-| 122 | [skill-doctor](skills/skill-doctor) | 在用 skill 的复利迭代器——任务收尾时把本次真实使用经验复盘成补丁，安全落盘并记入账本，让同一个 skill 在新场景下越用越准（观察→提炼→判定→落盘→记账）。触发词：skill 复盘、迭代 ... |
-| 123 | [skill-vetter](skills/skill-vetter-1.0.0) | Security-first skill vetting for AI agents. Use before installing any skill from ClawdHub, GitHub, o... |
-| 124 | [social-content](skills/social-content-generator-0.1.0) | When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twit... |
-| 125 | [Social Media Scheduler](skills/social-media-scheduler-1.0.0) | Plan, draft, and organize social media content across platforms. Create content calendars, write pla... |
-| 126 | [supabase-postgres-best-practices](skills/supabase-postgres-best-practices) | Postgres performance optimization and best practices from Supabase. Use this skill when writing, rev... |
-| 127 | [tdd](skills/tdd) | Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions ... |
-| 128 | [teach](skills/teach) | Teach the user a new skill or concept, within this workspace. |
-| 129 | [test-runner](skills/test-runner-1.0.0) | Write and run tests across languages and frameworks. Use when writing, running, or fixing tests. |
-| 130 | [tmux](skills/tmux-1.0.0) | Remote-control tmux sessions for interactive CLIs by sending keystrokes and scraping pane output. |
-| 131 | [to-questionnaire](skills/to-questionnaire) | Turn a decision you can't fully answer into a questionnaire for someone else to fill in. |
-| 132 | [to-spec](skills/to-spec) | Turn the current conversation into a spec and publish it to the project issue tracker — no interview... |
-| 133 | [to-tickets](skills/to-tickets) | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring ... |
-| 134 | [triage](skills/triage) | Move issues and external PRs through a state machine of triage roles — categorise, verify, grill if ... |
-| 135 | [ubiquitous-language](skills/ubiquitous-language) | Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities... |
-| 136 | [ui-ux-pro-max](skills/ui-ux-pro-max-0.1.0) | UI/UX design intelligence and implementation guidance for building polished interfaces. Use when the... |
-| 137 | [unify-design](skills/unify-design) | Establishes a web project's design system as the single source of truth — colors, spacing, typograph... |
-| 138 | [vibesubin](skills/vibesubin) | The vibesubin command and vibe. Runs every code-hygiene specialist in the plugin across a repository... |
-| 139 | [video-frames](skills/video-frames-1.0.0) | Extract frames or short clips from videos using ffmpeg. |
-| 140 | [wayfinder](skills/wayfinder) | Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision ticke... |
-| 141 | [wecom-chat-extractor](skills/wecom-chat-extractor) | Extract and query local chat data on Windows for BOTH WeCom (企业微信/WeChat Work) and personal WeChat 4... |
-| 142 | [wizard](skills/wizard) | Generate an interactive bash wizard that walks a human through a manual procedure — third-party setu... |
-| 143 | [write-for-ai](skills/write-for-ai) | Writes documentation, commit messages, and PR descriptions optimized for the NEXT AI session to unde... |
-| 144 | [writing-beats](skills/writing-beats) | Writing, exploit — assemble raw material into a journey of beats, grounding each term before a beat ... |
-| 145 | [writing-fragments](skills/writing-fragments) | Writing, explore — mine raw fragments, no structure yet. |
-| 146 | [writing-great-skills](skills/writing-great-skills) | Reference for writing and editing skills well — the vocabulary and principles that make a skill pred... |
-| 147 | [writing-plans](skills/writing-plans-0.1.0) | Use when you have a spec or requirements for a multi-step task, before touching code |
-| 148 | [writing-shape](skills/writing-shape) | Writing, exploit — shape raw material into an article, paragraph by paragraph. |
+| 43 | [doc-coauthoring](skills/doc-coauthoring) | Guide users through a structured workflow for co-authoring documentation. Use when user wants to wri... |
+| 44 | [documentation-and-adrs](skills/documentation-and-adrs) | 记录技术决策及其背景、约束、备选方案和取舍，并维护架构决策记录、公共 API 文档、README、变更日志与面向开发代理的项目规则。适用于作出重要架构决策、比较竞争方案、新增或修改公共接口、发布影响用... |
+| 45 | [domain-modeling](skills/domain-modeling) | Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology o... |
+| 46 | [edit-article](skills/edit-article) | Edit and improve articles by restructuring sections, improving clarity, and tightening prose. Use wh... |
+| 47 | [executing-plans](skills/executing-plans-0.1.0) | Use when you have a written implementation plan to execute in a separate session with review checkpo... |
+| 48 | [fanqie-image-restore](skills/fanqie-image-restore) | Restore 混淆图/加密图 from 番茄图片混淆/小番茄 (fanqie/tomato) apps, including 空间曲线混淆(Gilbert curve)、块混淆、逐像素/行像素混淆.... |
+| 49 | [feishu-chat-history](skills/feishu-chat-history) | Fetch and summarize Feishu group chat history. Use when the user asks to read, review, or summarize ... |
+| 50 | [feishu-common](skills/feishu-common) | Shared Feishu (Lark) auth library for feishu-* skills. Provides tenant_access_token caching and auth... |
+| 51 | [feishu-cron-reminder](skills/feishu-cron-reminder) | Create cron jobs that reliably deliver reminders to Feishu (飞书) chats. Use when the user asks to set... |
+| 52 | [feishu-doc](skills/feishu-doc-1.2.7) | Fetch content from Feishu (Lark) Wiki, Docs, Sheets, and Bitable. Automatically resolves Wiki URLs t... |
+| 53 | [feishu-drive](skills/feishu-drive-1.0.0) | 飞书云空间文件管理 Skill。上传/下载/移动/搜索文件、创建文件夹、获取元数据等。当需要管理飞书云空间中的文件和文件夹时使用此 Skill。 |
+| 54 | [feishu-perm](skills/feishu-perm) | Feishu permission management for documents and files. Activate when user mentions sharing, permissio... |
+| 55 | [feishu-screenshot](skills/feishu-screenshot) | Capture macOS screenshots and send to Feishu. Use when the user asks to take a screenshot and share ... |
+| 56 | [feishu-send-file](skills/feishu-send-file) | Send files to a Feishu group or user via REST API. Use when the user explicitly asks to send a file,... |
+| 57 | [feishu-wiki-export](skills/feishu-wiki-export) | 递归导出飞书（Lark）知识库/Wiki 为本地 Markdown 完整备份，含图片、附件、表格、Mermaid 图表与层级目录。与 feishu-doc（单篇读写）互补，面向整棵树批量导出。Use when：用户说"导出飞书文档、导... |
+| 58 | [FFmpeg Video Editor](skills/ffmpeg-video-editor-1.0.0) | Generate FFmpeg commands from natural language video editing requests - cut, trim, convert, compress... |
+| 59 | [fight-repo-rot](skills/fight-repo-rot) | Finds what's rotting in a repo and returns a prioritized diagnosis — dead code first, then god files... |
+| 60 | [find-skills](skills/find-skills) | Helps users discover and install agent skills when they ask questions like "how do I do X", "find a ... |
+| 61 | [foxcode-image-gen](skills/foxcode-image-gen) | Generate high-quality images via the FoxCode gpt-image-2 API. Use when the user asks to generate, cr... |
+| 62 | [frontend-design](skills/frontend-design-3-0.1.0) | Create distinctive, production-grade frontend interfaces with high design quality. Use this skill wh... |
+| 63 | [git-essentials](skills/git-essentials-1.0.0) | Essential Git commands and workflows for version control, branching, and collaboration. |
+| 64 | [git-guardrails-claude-code](skills/git-guardrails-claude-code) | Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.... |
+| 65 | [grill-me](skills/grill-me) | A relentless interview to sharpen a plan or design. |
+| 66 | [grill-with-docs](skills/grill-with-docs) | A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as ... |
+| 67 | [grilling](skills/grilling) | Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test ... |
+| 68 | [handoff](skills/handoff) | Compact the current conversation into a handoff document for another agent to pick up. |
+| 69 | [humanizer](skills/humanizer) | Rewrite AI-sounding text so it reads like the writer without changing what it says. Use when editing... |
+| 70 | [implement](skills/implement) | Implement a piece of work based on a spec or set of tickets. |
+| 71 | [improve-codebase-architecture](skills/improve-codebase-architecture) | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill throug... |
+| 72 | [interview-designer](skills/interview-designer-1.0.0) | Analyze resumes and design interview strategies using evidence-based methodology. Transforms intervi... |
+| 73 | [interview-prep-generator](skills/interview-prep-generator) | Use when the user is preparing for a job interview, practicing behavioral questions, or wants STAR s... |
+| 74 | [loop-me](skills/loop-me) | Grill me about specs for the workflows I want to build, within this workspace. |
+| 75 | [manage-assets](skills/manage-assets) | Finds oversized files, binary bloat, and accidental artifact commits in a repo — large files current... |
+| 76 | [manage-secrets-env](skills/manage-secrets-env) | Opinionated defaults and full lifecycle playbook for secrets and environment variables. Decides wher... |
+| 77 | [Market Research](skills/market-research-1.0.0) | Size markets, analyze competitors, and validate opportunities with practical frameworks and free dat... |
+| 78 | [Memory](skills/memory-1.0.2) | Infinite organized memory that complements your agent's built-in memory with unlimited categorized s... |
+| 79 | [microsoft-foundry](skills/microsoft-foundry) | Build, deploy, evaluate, optimize, fine-tune, and manage Microsoft Foundry agents, models, and resou... |
+| 80 | [migrate-to-shoehorn](skills/migrate-to-shoehorn) | Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions s... |
+| 81 | [obsidian-ontology-sync](skills/obsidian-ontology-sync-1.0.1) | Bidirectional sync between Obsidian PKM (human-friendly notes) and structured ontology (machine-quer... |
+| 82 | [obsidian-vault](skills/obsidian-vault) | Search, create, and manage notes in the Obsidian vault with wikilinks and index notes. Use when user... |
+| 83 | [opencode-chat-viewer](skills/opencode-chat-viewer) | 查看本机 OpenCode 自己的历史对话记录。数据源是 OpenCode 本地 SQLite 数据库（~/.local/share/opencode/opencode.db，session/mess... |
+| 84 | [opencode-controller](skills/opencode-controller-1.0.0) | Control and operate Opencode via slash commands. Use this skill to manage sessions, select models, s... |
+| 85 | [parallel-data-processing](skills/parallel-data-processing) | 精细化批量数据处理通用工作流。当需要对大量结构化数据逐条进行精细处理（分类、审核、翻译、改写、信息提取、打标、清洗、校验等）时使用，例如"把这些FAQ逐条分类"、"给这1万条记录逐条打标签"、"逐条翻... |
+| 86 | [perf-goal-fill](skills/perf-goal-fill) | Fill ??????????/???and??????in a human, goal-not-result style. Use when filling ?????, ??/??, ????, ... |
+| 87 | [ponytail](skills/ponytail) | Forces the laziest solution that actually works, simplest, shortest, most minimal. Channels a senior... |
+| 88 | [ponytail-audit](skills/ponytail-audit) | Whole-repo audit for over-engineering. Like ponytail-review, but scans the entire codebase instead o... |
+| 89 | [ponytail-debt](skills/ponytail-debt) | Harvest every `ponytail:` comment in the codebase into a debt ledger, so the deliberate shortcuts an... |
+| 90 | [ponytail-gain](skills/ponytail-gain) | Show ponytail's measured impact as a compact scoreboard: less code, less cost, more speed, from the ... |
+| 91 | [ponytail-help](skills/ponytail-help) | Quick-reference card for all ponytail modes, skills, and commands. One-shot display, not a persisten... |
+| 92 | [ponytail-review](skills/ponytail-review) | Code review focused exclusively on over-engineering. Finds what to delete: reinvented standard libra... |
+| 93 | [ppt-design-skill](skills/ppt-design-skill) | Design, generate, review, and revise editable PowerPoint presentations through a rigorous brief-to-P... |
+| 94 | [pretty-mermaid](skills/pretty-mermaid) | Generate and render Mermaid diagrams for architecture docs, READMEs, PRs, terminals, chats, and CI a... |
+| 95 | [project-conventions](skills/project-conventions) | Opinionated defaults for the lower-stakes structural conventions every project has to pick — branch ... |
+| 96 | [prototype](skills/prototype) | Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whe... |
+| 97 | [qa](skills/qa) | Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHu... |
+| 98 | [refactor-verify](skills/refactor-verify) | Proves a behavior-preserving code change (refactor, rename, split, merge, extract, inline, or delete... |
+| 99 | [request-refactor-plan](skills/request-refactor-plan) | Create a detailed refactor plan with tiny commits via user interview, then file it as a GitHub issue... |
+| 100 | [research](skills/research) | Investigate a question against high-trust primary sources and capture the findings as a Markdown fil... |
+| 101 | [research-paper-writer](skills/research-paper-writer-0.1.0) | Creates formal academic research papers following IEEE/ACM formatting standards with proper structur... |
+| 102 | [resolving-merge-conflicts](skills/resolving-merge-conflicts) | Use when you need to resolve an in-progress git merge/rebase conflict. |
+| 103 | [resume-builder](skills/resume-builder) | Use when the user wants to create, improve, optimize, review, rewrite, format, or translate a resume... |
+| 104 | [resume-tailor](skills/resume-tailor) | Use when the user wants their existing resume tailored or customized for a specific job posting (JD)... |
+| 105 | [salary-negotiation-prep](skills/salary-negotiation-prep) | Use when the user has a job offer and wants to negotiate salary, research market compensation, write... |
+| 106 | [scaffold-exercises](skills/scaffold-exercises) | Create exercise directory structures with sections, problems, solutions, and explainers that pass li... |
+| 107 | [security-auditor](skills/security-auditor-1.0.0) | Use when reviewing code for security vulnerabilities, implementing authentication flows, auditing OW... |
+| 108 | [Self-Improving Agent (With Self-Reflection)](skills/self-improving-1.1.3) | Self-reflection + Self-criticism + learning from corrections. Agent evaluates its own work, catches ... |
+| 109 | [sentry-create-alert](skills/sentry-create-alert) | Create Sentry alerts using the workflow engine API. Use when asked to create alerts, set up notifica... |
+| 110 | [sentry-debug-issue](skills/sentry-debug-issue) | Debug and fix a Sentry issue — find it (by link, ID, or search), pull full context (stack trace, bre... |
+| 111 | [sentry-fix-stack-traces](skills/sentry-fix-stack-traces) | Make Sentry stack traces readable — upload source maps for JavaScript/TypeScript, or debug files for... |
+| 112 | [sentry-get-started](skills/sentry-get-started) | Guided entry point for using Sentry through your agent. Orients you to your current setup and, for a... |
+| 113 | [sentry-instrument](skills/sentry-instrument) | Instrument an application with Sentry — detect the platform, install and initialize the SDK if neede... |
+| 114 | [sentry-otel-exporter-setup](skills/sentry-otel-exporter-setup) | Configure the OpenTelemetry Collector with Sentry Exporter for multi-project routing and automatic p... |
+| 115 | [sentry-setup-releases](skills/sentry-setup-releases) | Set up Sentry releases and deploy tracking — tag events with a version and environment, create the r... |
+| 116 | [sentry-snapshots-cocoa](skills/sentry-snapshots-cocoa) | Full Sentry Snapshots setup for Apple/Cocoa projects. Use when asked to "setup SnapshotPreviews", "s... |
+| 117 | [SEO (Site Audit + Content Writer + Competitor Analysis)](skills/seo-1.0.3) | SEO specialist agent with site audits, content writing, keyword research, technical fixes, link buil... |
+| 118 | [seo-content-writer](skills/seo-content-writer-2.0.0) | Use when the user asks to "write SEO content", "create a blog post", "write an article", "content wr... |
+| 119 | [session-logs](skills/session-logs-1.0.0) | Search and analyze your own session logs (older/parent conversations) using jq. |
+| 120 | [setup-ci](skills/setup-ci) | Teaches CI/CD from first principles to a non-developer, then scaffolds a working test + deploy pipel... |
+| 121 | [setup-matt-pocock-skills](skills/setup-matt-pocock-skills) | Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, ... |
+| 122 | [setup-pre-commit](skills/setup-pre-commit) | Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current r... |
+| 123 | [setup-ts-deep-modules](skills/setup-ts-deep-modules) | Wire dependency-cruiser into a TypeScript repo so each package is a deep module — implementation hid... |
+| 124 | [ship-cycle](skills/ship-cycle) | Issue-driven development orchestrator. Turns improvement intent into a well-specified, bilingual iss... |
+| 125 | [skill-creator](skills/skill-creator-0.1.0) | Guide for creating effective skills. This skill should be used when users want to create a new skill... |
+| 126 | [skill-doctor](skills/skill-doctor) | 在用 skill 的复利迭代器——任务收尾时把本次真实使用经验复盘成补丁，安全落盘并记入账本，让同一个 skill 在新场景下越用越准（观察→提炼→判定→落盘→记账）。触发词：skill 复盘、迭代 ... |
+| 127 | [skill-vetter](skills/skill-vetter-1.0.0) | Security-first skill vetting for AI agents. Use before installing any skill from ClawdHub, GitHub, o... |
+| 128 | [social-content](skills/social-content-generator-0.1.0) | When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twit... |
+| 129 | [Social Media Scheduler](skills/social-media-scheduler-1.0.0) | Plan, draft, and organize social media content across platforms. Create content calendars, write pla... |
+| 130 | [supabase-postgres-best-practices](skills/supabase-postgres-best-practices) | Postgres performance optimization and best practices from Supabase. Use this skill when writing, rev... |
+| 131 | [tapd-work-recording](skills/tapd-work-recording) | 把工作内容（日报/纪要/对话记录）转成 TAPD 任务卡，并通过 MCP 创建、复核与补工时。 内置本项目 TAPD（百运与中技公共项目需求池等）的容器落位指南、字段映射（任务类型=custom_fi... |
+| 132 | [tdd](skills/tdd) | Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions ... |
+| 133 | [teach](skills/teach) | Teach the user a new skill or concept, within this workspace. |
+| 134 | [test-runner](skills/test-runner-1.0.0) | Write and run tests across languages and frameworks. Use when writing, running, or fixing tests. |
+| 135 | [tmux](skills/tmux-1.0.0) | Remote-control tmux sessions for interactive CLIs by sending keystrokes and scraping pane output. |
+| 136 | [to-questionnaire](skills/to-questionnaire) | Turn a decision you can't fully answer into a questionnaire for someone else to fill in. |
+| 137 | [to-spec](skills/to-spec) | Turn the current conversation into a spec and publish it to the project issue tracker — no interview... |
+| 138 | [to-tickets](skills/to-tickets) | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring ... |
+| 139 | [triage](skills/triage) | Move issues and external PRs through a state machine of triage roles — categorise, verify, grill if ... |
+| 140 | [ubiquitous-language](skills/ubiquitous-language) | Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities... |
+| 141 | [ui-ux-pro-max](skills/ui-ux-pro-max-0.1.0) | UI/UX design intelligence and implementation guidance for building polished interfaces. Use when the... |
+| 142 | [unify-design](skills/unify-design) | Establishes a web project's design system as the single source of truth — colors, spacing, typograph... |
+| 143 | [vibesubin](skills/vibesubin) | The vibesubin command and vibe. Runs every code-hygiene specialist in the plugin across a repository... |
+| 144 | [video-frames](skills/video-frames-1.0.0) | Extract frames or short clips from videos using ffmpeg. |
+| 145 | [wayfinder](skills/wayfinder) | Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision ticke... |
+| 146 | [wecom-chat-extractor](skills/wecom-chat-extractor) | Extract and query local chat data on Windows for BOTH WeCom (企业微信/WeChat Work) and personal WeChat 4... |
+| 147 | [wizard](skills/wizard) | Generate an interactive bash wizard that walks a human through a manual procedure — third-party setu... |
+| 148 | [write-for-ai](skills/write-for-ai) | Writes documentation, commit messages, and PR descriptions optimized for the NEXT AI session to unde... |
+| 149 | [writing-beats](skills/writing-beats) | Writing, exploit — assemble raw material into a journey of beats, grounding each term before a beat ... |
+| 150 | [writing-fragments](skills/writing-fragments) | Writing, explore — mine raw fragments, no structure yet. |
+| 151 | [writing-great-skills](skills/writing-great-skills) | Reference for writing and editing skills well — the vocabulary and principles that make a skill pred... |
+| 152 | [writing-plans](skills/writing-plans-0.1.0) | Use when you have a spec or requirements for a multi-step task, before touching code |
+| 153 | [writing-shape](skills/writing-shape) | Writing, exploit — shape raw material into an article, paragraph by paragraph. |
 
