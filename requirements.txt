@@ -11,7 +11,7 @@ pyyaml>=6.0
 azure-ai-projects>=1.0.0
 azure-identity>=1.16.0
 
-# microsoft-foundry: HTTP client
+# microsoft-foundry / ucpan-download: HTTP client
 httpx>=0.27.0
 requests>=2.31.0
 

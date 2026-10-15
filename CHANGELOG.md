@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-10-15
+
+### Added
+- `ucpan-download` — UC网盘分享链接匿名解析 + 多线程下载（`scripts/ucpan-dl.py`，无需客户端、多数文件无需登录）：递归扫描目录树、单文件16分块并发 × 多文件并行（突破单连接 ~100KB/s 限速，实测 2~3MB/s）、分块断点续传、`share_fid_token` 过期自动换链、`.apk` 等需登录文件支持 `--cookie`
+
+### Changed
+- Skill count from 153 to 154, regenerated README index
+- `requirements.txt`: `requests` 条目注释补充 ucpan-download（无需新增依赖）
+- Kept credentials sanitized (placeholders only, never commit secrets); excluded `__pycache__`/`.pyc`
+
 ## [1.7.0] - 2026-10-13
 
 ### Added

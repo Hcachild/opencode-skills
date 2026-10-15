@@ -1,6 +1,6 @@
 # opencode-skills
 
-Personal collection of 153 opencode agent skills.
+Personal collection of 154 opencode agent skills.
 
 ## Quick Start
 
@@ -91,7 +91,7 @@ After installation, fill in credentials for these skills:
 
 ```
 opencode-skills/
-├── skills/              # 153 skill directories
+├── skills/              # 154 skill directories
 ├── install.sh           # macOS/Linux installer
 ├── install.ps1          # Windows installer
 ├── Makefile             # Build/install/validate commands
@@ -105,7 +105,7 @@ opencode-skills/
 └── README.md            # This file
 ```
 
-## Skill Index (153 skills)
+## Skill Index (154 skills)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -249,17 +249,18 @@ opencode-skills/
 | 138 | [to-tickets](skills/to-tickets) | Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring ... |
 | 139 | [triage](skills/triage) | Move issues and external PRs through a state machine of triage roles — categorise, verify, grill if ... |
 | 140 | [ubiquitous-language](skills/ubiquitous-language) | Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities... |
-| 141 | [ui-ux-pro-max](skills/ui-ux-pro-max-0.1.0) | UI/UX design intelligence and implementation guidance for building polished interfaces. Use when the... |
-| 142 | [unify-design](skills/unify-design) | Establishes a web project's design system as the single source of truth — colors, spacing, typograph... |
-| 143 | [vibesubin](skills/vibesubin) | The vibesubin command and vibe. Runs every code-hygiene specialist in the plugin across a repository... |
-| 144 | [video-frames](skills/video-frames-1.0.0) | Extract frames or short clips from videos using ffmpeg. |
-| 145 | [wayfinder](skills/wayfinder) | Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision ticke... |
-| 146 | [wecom-chat-extractor](skills/wecom-chat-extractor) | Extract and query local chat data on Windows for BOTH WeCom (企业微信/WeChat Work) and personal WeChat 4... |
-| 147 | [wizard](skills/wizard) | Generate an interactive bash wizard that walks a human through a manual procedure — third-party setu... |
-| 148 | [write-for-ai](skills/write-for-ai) | Writes documentation, commit messages, and PR descriptions optimized for the NEXT AI session to unde... |
-| 149 | [writing-beats](skills/writing-beats) | Writing, exploit — assemble raw material into a journey of beats, grounding each term before a beat ... |
-| 150 | [writing-fragments](skills/writing-fragments) | Writing, explore — mine raw fragments, no structure yet. |
-| 151 | [writing-great-skills](skills/writing-great-skills) | Reference for writing and editing skills well — the vocabulary and principles that make a skill pred... |
-| 152 | [writing-plans](skills/writing-plans-0.1.0) | Use when you have a spec or requirements for a multi-step task, before touching code |
-| 153 | [writing-shape](skills/writing-shape) | Writing, exploit — shape raw material into an article, paragraph by paragraph. |
+| 141 | [ucpan-download](skills/ucpan-download) | Download files/folders from UC网盘 (ucpan, drive.uc.cn, fast.uc.cn) share links without the official c... |
+| 142 | [ui-ux-pro-max](skills/ui-ux-pro-max-0.1.0) | UI/UX design intelligence and implementation guidance for building polished interfaces. Use when the... |
+| 143 | [unify-design](skills/unify-design) | Establishes a web project's design system as the single source of truth — colors, spacing, typograph... |
+| 144 | [vibesubin](skills/vibesubin) | The vibesubin command and vibe. Runs every code-hygiene specialist in the plugin across a repository... |
+| 145 | [video-frames](skills/video-frames-1.0.0) | Extract frames or short clips from videos using ffmpeg. |
+| 146 | [wayfinder](skills/wayfinder) | Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision ticke... |
+| 147 | [wecom-chat-extractor](skills/wecom-chat-extractor) | Extract and query local chat data on Windows for BOTH WeCom (企业微信/WeChat Work) and personal WeChat 4... |
+| 148 | [wizard](skills/wizard) | Generate an interactive bash wizard that walks a human through a manual procedure — third-party setu... |
+| 149 | [write-for-ai](skills/write-for-ai) | Writes documentation, commit messages, and PR descriptions optimized for the NEXT AI session to unde... |
+| 150 | [writing-beats](skills/writing-beats) | Writing, exploit — assemble raw material into a journey of beats, grounding each term before a beat ... |
+| 151 | [writing-fragments](skills/writing-fragments) | Writing, explore — mine raw fragments, no structure yet. |
+| 152 | [writing-great-skills](skills/writing-great-skills) | Reference for writing and editing skills well — the vocabulary and principles that make a skill pred... |
+| 153 | [writing-plans](skills/writing-plans-0.1.0) | Use when you have a spec or requirements for a multi-step task, before touching code |
+| 154 | [writing-shape](skills/writing-shape) | Writing, exploit — shape raw material into an article, paragraph by paragraph. |
 
