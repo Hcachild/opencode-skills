@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-10-15
+
+### Changed
+- Updated `ucpan-download` — 新增 `--check` 匿名边界探测（逐文件试取 1KB，按类型汇总「可下载/需登录」）；`--cookie` 现在同时携带到 CDN 下载请求
+- Updated `ucpan-download` — 实测厘清匿名下载边界：图片类（png/jpg/jpeg，297 文件含 13.3MB 大图）可匿名下载；其他所有类型（apk/exe/dmg/zip/7z/分卷 .001x/mp4/pdf，0.2MB–875MB，20+ 分享样本）统一 403 `require login`，与文件大小、UA、Referer 无关，`risk_type/ban` 元数据均为 0；结论与故障排查已写入 SKILL.md
+- Skill count unchanged at 154
+
 ## [1.8.0] - 2026-10-15
 
 ### Added

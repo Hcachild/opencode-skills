@@ -3,14 +3,16 @@
 
 特性:
   - 匿名解析分享链接（drive.uc.cn / fast.uc.cn），无需客户端、无需登录
+  - 匿名边界（2026-10 实测）：图片类可下，其他类型（apk/exe/压缩包/mp4/pdf…）统一 403 需登录，此时用 --cookie
   - 递归扫描目录树，保留原目录结构
   - 单文件多连接分块并发 + 多文件并行，突破单连接 ~100KB/s 限速
   - 断点续传（分块级）+ 直链过期自动刷新
+  - --check 模式：逐文件探测匿名可下载性（可下载 / 需登录），下载前先摸清边界
   - 支持提取码分享；如匿名受限可传 --cookie
 
 用法:
   python ucpan-dl.py <分享链接> [--out DIR] [--pwd 提取码] [--cookie "xx=yy"]
-                       [--jobs 3] [--chunks 16] [--only 正则] [--list]
+                       [--jobs 3] [--chunks 16] [--only 正则] [--list] [--check]
 
 示例:
   python ucpan-dl.py "https://drive.uc.cn/s/ca97d20a92444?public=1#/list/share" --out .\out
@@ -448,6 +450,58 @@ def fetch_one(
     return True
 
 
+def check_files(pan: UcPan, files: list[dict], jobs: int = 8) -> None:
+    log("[..] 申请下载直链…")
+    urls = pan.download_urls(files)
+    log(f"[ok] 拿到 {len(urls)}/{len(files)} 条直链")
+
+    def probe(meta: dict) -> tuple[dict, str]:
+        fid = meta["fid"]
+        if fid not in urls:
+            return meta, "无直链(API未返回)"
+        url, _ = urls[fid]
+        try:
+            r = requests.get(
+                url, headers={**DL_HEADERS, "Range": "bytes=0-1023"}, stream=True, timeout=20
+            )
+        except requests.RequestException as e:
+            return meta, f"网络错误({type(e).__name__})"
+        try:
+            status = r.status_code
+            if status in (200, 206):
+                return meta, "可下载"
+            if status == 403:
+                txt = r.text
+                if "require login" in txt:
+                    return meta, "需登录"
+                m = re.search(r"<Code>([^<]+)</Code>", txt)
+                return meta, f"403({m.group(1) if m else '未知'})"
+            return meta, f"HTTP {status}"
+        finally:
+            r.close()
+
+    from collections import Counter
+
+    stats: Counter = Counter()
+    problems: list[tuple[str, str]] = []
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        for meta, verdict in pool.map(probe, files):
+            ext = PurePosixPath(meta["_rel"]).suffix.lower() or "(无扩展名)"
+            stats[(ext, verdict)] += 1
+            if verdict != "可下载":
+                problems.append((meta["_rel"], verdict))
+
+    log("\n[检查结果] 按类型统计:")
+    for (ext, verdict), n in sorted(stats.items()):
+        log(f"  {ext:<10} {verdict:<14} x{n}")
+    if problems:
+        log("\n[受限文件]")
+        for rel, verdict in problems:
+            log(f"  - [{verdict}] {rel}")
+    else:
+        log("\n[ok] 所有文件均可下载")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="UC网盘分享链接多线程下载器")
     ap.add_argument("url", help="分享链接，如 https://drive.uc.cn/s/xxxx")
@@ -458,7 +512,11 @@ def main() -> None:
     ap.add_argument("--chunks", type=int, default=16, help="单文件分块并发数 (默认16)")
     ap.add_argument("--only", default="", help="只下载路径匹配该正则的文件")
     ap.add_argument("--list", action="store_true", help="仅列出文件不下载")
+    ap.add_argument("--check", action="store_true", help="仅探测各文件是否可下载（边界检查），不下载")
     args = ap.parse_args()
+
+    if args.cookie:
+        DL_HEADERS["Cookie"] = args.cookie
 
     share_id = parse_share_id(args.url)
     pan = UcPan(share_id, args.pwd, args.cookie)
@@ -497,6 +555,10 @@ def main() -> None:
     if args.list:
         for f in files:
             print(f"{human(int(f.get('size', 0) or 0)):>10}  {f['_rel']}")
+        return
+
+    if args.check:
+        check_files(pan, files)
         return
 
     log("[..] 申请下载直链…")
