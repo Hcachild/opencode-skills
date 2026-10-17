@@ -19,6 +19,9 @@ python ...\ucpan-dl.py "<分享链接>" --out "D:\ucpan" --list
 # 只下载匹配正则的子集
 python ...\ucpan-dl.py "<分享链接>" --out "D:\ucpan" --only "原神"
 
+# 定向下载：在浏览器分享页里点进某个文件夹，把地址栏整条链接粘过来 → 只下该文件夹（含子目录）
+python ...\ucpan-dl.py "https://drive.uc.cn/s/xxxx?public=1#/list/share/<fid>-名称/<fid>-名称/..." --out "D:\ucpan"
+
 # 需要非图片文件（apk/exe/zip/mp4/pdf 等）时：先扫码登录一次（约 10 秒，存 ~/.ucpan_cookie）
 python ...\ucpan-login.py
 # 之后 ucpan-dl 自动读取凭证，无需任何参数；也可手动 --cookie/--cookie-file 传
@@ -32,6 +35,7 @@ python ...\ucpan-login.py
 - **断点续传且幂等**：直接重跑同一命令即可——已完成文件自动跳过、未完成从 `.part*` 分块续传、token 过期自动刷新换链。**重试失败文件优先用重跑，不要另存新目录**。
 - **速度**：单连接被限速 ~100KB/s，靠并发堆速度。默认 3 文件 × 16 分块 ≈ 2~3MB/s（视网络）。若太慢可加大 `--jobs 4~5`；被风控/报错多则减。
 - **需要登录的文件**：非图片类型（`.apk/.exe/.zip/.7z/.mp4/.pdf` 等）会被 CDN 拒绝（`require login [auth not found]`），与大小无关（1.2MB 的 pdf 也拦）。解法：跑 `ucpan-login.py` 扫码一次（Cookie 存到 `~/.ucpan_cookie`，ucpan-dl 自动使用）；或用浏览器登录后 F12 `copy(document.cookie)`，`--cookie "<粘贴>"` 重跑（只补缺失文件）。不要尝试免登录绕。
+- **深链接定向下载**：粘贴带 `#/list/share/<fid>-<名称>/...` 的地址（在分享页点进文件夹后的地址栏链接）→ 只扫描最深一级文件夹的子树（按 fid 解析，不依赖名称），文件落到 `<--out>/<文件夹真实名>/` 下；索引缓存按 (分享ID, 文件夹) 隔离。
 - **先探测再下载**：拿不准可下载哪些文件时，先跑 `--check`（逐文件试取 1KB，按类型输出「可下载/需登录」统计），再决定是否需要 cookie。
 - **凭证有效性**：ucpan-dl 启动时自动校验 `~/.ucpan_cookie`，无效会提示「登录凭证无效/已过期，本次按匿名模式运行」——重跑 `ucpan-login.py` 即可。
 - 分享标题、文件数会在开头打印；`--list` 输出每行 `大小 路径`，适合先展示给用户挑。

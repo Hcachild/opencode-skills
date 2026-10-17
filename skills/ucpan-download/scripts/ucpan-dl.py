@@ -9,6 +9,7 @@
   - 断点续传（分块级）+ 直链过期自动刷新
   - --check 模式：逐文件探测匿名可下载性（可下载 / 需登录），下载前先摸清边界
   - 凭证：--cookie 直接传；或先跑 ucpan-login.py 手机扫码一次（保存到 ~/.ucpan_cookie，本脚本自动检测使用）
+  - 深链接：分享页里点进文件夹后的地址（#/list/share/<fid>-<名称>/...）可直接粘贴，只下载该文件夹子树
 
 用法:
   python ucpan-dl.py <分享链接> [--out DIR] [--pwd 提取码] [--cookie "xx=yy"]
@@ -83,11 +84,35 @@ def whoami(cookie: str) -> str | None:
     return None
 
 
-def parse_share_id(url: str) -> str:
+def parse_share_target(url: str) -> tuple[str, str | None, str, str | None]:
+    """解析分享链接 → (share_id, 起始文件夹fid, 起始文件夹名, 父文件夹fid)。
+
+    支持分享页深链接（浏览器里点进文件夹后地址栏的样子）：
+      https://drive.uc.cn/s/<id>?public=1#/list/share/<fid>-<名称>/<fid>-<名称>/...
+    此时只扫描最深一级文件夹的子树；无深链接则从分享根目录扫描。
+    """
     m = re.search(r"/s/([0-9a-zA-Z]+)", url)
     if not m:
         raise SystemExit(f"无法从链接中解析分享ID: {url}")
-    return m.group(1)
+    sid = m.group(1)
+    start_fid: str | None = None
+    start_name = ""
+    parent_fid: str | None = None
+    if "#" in url:
+        frag = url.split("#", 1)[1]
+        parts = [p for p in frag.split("/") if p]
+        if "share" in parts:
+            segs = [p for p in parts[parts.index("share") + 1 :] if re.match(r"[0-9a-fA-F]{32}-", p)]
+            if segs:
+                last = segs[-1]
+                fid_part, _, name_part = last.partition("-")
+                if re.fullmatch(r"[0-9a-fA-F]{32}", fid_part):
+                    start_fid = fid_part
+                    from urllib.parse import unquote
+
+                    start_name = unquote(name_part)
+                    parent_fid = segs[-2].split("-", 1)[0] if len(segs) >= 2 else "0"
+    return sid, start_fid, start_name, parent_fid
 
 
 class TokenExpired(Exception):
@@ -176,7 +201,7 @@ class UcPan:
             page += 1
         return out
 
-    def walk(self) -> list[dict]:
+    def walk(self, start_fid: str = "0", rel_prefix: str = ".") -> list[dict]:
         files: list[dict] = []
 
         def rec(fid: str, rel: str) -> None:
@@ -189,7 +214,7 @@ class UcPan:
                     it["_pdir"] = fid
                     files.append(it)
 
-        rec("0", ".")
+        rec(start_fid, rel_prefix)
         return files
 
     def refresh_single(self, meta: dict) -> tuple[str, int] | None:
@@ -561,30 +586,59 @@ def main() -> None:
             log("[warn] 登录凭证无效/已过期，本次按匿名模式运行（运行 ucpan-login.py 可刷新）")
             cookie = ""
 
-    share_id = parse_share_id(args.url)
+    share_id, start_fid, start_name, parent_fid = parse_share_target(args.url)
     pan = UcPan(share_id, args.pwd, cookie)
     pan.token()
+    rel_prefix = "."
+    if start_fid:
+        try:
+            for it in pan.list_dir(parent_fid or "0"):
+                if it.get("fid") == start_fid and it.get("file_name"):
+                    start_name = it["file_name"]
+                    break
+        except SystemExit:
+            pass
+        rel_prefix = f"./{start_name or start_fid}"
+        log(f"[ok] 深链接定位: 仅扫描「{start_name or start_fid}」(fid={start_fid}) 子树")
 
     out_dir = Path(args.out)
     index_file = out_dir / ".ucpan_index.json"
+    scope = start_fid or "0"
     files: list[dict] = []
     if index_file.exists():
         try:
-            files = json.loads(index_file.read_text(encoding="utf-8"))
-            log(f"[ok] 复用索引缓存: {len(files)} 个文件")
+            raw = json.loads(index_file.read_text(encoding="utf-8"))
+            if isinstance(raw, dict) and raw.get("share_id") == share_id and raw.get("scope") == scope:
+                files = raw.get("files", [])
+                log(f"[ok] 复用索引缓存: {len(files)} 个文件")
+            elif isinstance(raw, list) and scope == "0":
+                files = raw
+                log(f"[ok] 复用索引缓存(旧格式): {len(files)} 个文件")
+            else:
+                files = []
         except Exception:
             files = []
 
-    if not files:
-        log("[..] 扫描目录树…")
-        files = pan.walk()
+    def save_index() -> None:
         out_dir.mkdir(parents=True, exist_ok=True)
-        index_file.write_text(json.dumps(files, ensure_ascii=False, indent=1), encoding="utf-8")
+        index_file.write_text(
+            json.dumps(
+                {"share_id": share_id, "scope": scope, "files": files},
+                ensure_ascii=False,
+                indent=1,
+            ),
+            encoding="utf-8",
+        )
+
+    if not files:
+        log("[..] 扫描目录树…" if scope == "0" else f"[..] 扫描子目录（fid={scope}）…")
+        files = pan.walk(scope, rel_prefix)
+        save_index()
         log(f"[ok] 扫描完成: {len(files)} 个文件，索引已存 {index_file}")
     elif "_pdir" not in files[0] or not pan.download_urls(files[:1]):
         log("[..] 索引已过期或缺父目录信息，重新扫描…")
-        files = pan.walk()
-        index_file.write_text(json.dumps(files, ensure_ascii=False, indent=1), encoding="utf-8")
+        files = pan.walk(scope, rel_prefix)
+        save_index()
         log(f"[ok] 重新扫描完成: {len(files)} 个文件")
 
     if args.only:

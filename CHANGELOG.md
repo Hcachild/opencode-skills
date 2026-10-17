@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-10-17
+
+### Changed
+- Updated `ucpan-download` — `ucpan-dl.py` 支持分享页**深链接定向下载**：直接粘贴分享页点进文件夹后的地址（`#/list/share/<fid>-<名称>/...`）即只扫描最深一级文件夹子树（按 fid 解析、经 API 取真实文件夹名），文件落至 `<--out>/<文件夹名>/`；索引缓存升级为 (share_id, scope) 结构并兼容旧格式
+- Skill count unchanged at 154
+
 ## [1.9.0] - 2026-10-17
 
 ### Added
