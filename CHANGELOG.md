@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-10-17
+
+### Added
+- `ucpan-download` — 新增 `ucpan-login.py`：UC网盘扫码登录一次性取 Cookie（官方 CAS 扫码接口，无需 UC 客户端/密码），出二维码 → 手机扫码确认 → Cookie 存 `~/.ucpan_cookie` → 进程退出，无常驻；`--timeout/--no-open` 可调
+- `ucpan-download` — `ucpan-dl.py` 支持 `--cookie-file` 并自动读取 `~/.ucpan_cookie`（启动时校验有效性，失效自动降级匿名模式）
+
+### Changed
+- Updated `ucpan-download` — 登录后边界完整实测（2026-10-17）：之前被拦的 7 个分享 `--check` 全部放行；实下 apk×2/exe/7z/dmg 370MB/pdf×2 全部成功且大小与元数据精确一致；大视频（713MB/917MB）抽查确认 HTTP 206 + 服务器文件大小一致 + ftyp 头正常（未触发「黑号替换」）；登录不解除单连接 ~100KB/s 限速（非会员），16 分块并发约 1.2~1.7MB/s；连续下载 >2GB 无配额拦截。结论已写入 SKILL.md
+- Updated `ucpan-download` — SKILL.md 补充：`ucpan-login.py` 用法、凭证自动校验、短信/账密/第三方扫码为何不可纯命令行化（滑块与官方页面限制）、扩展故障排查表
+- `requirements.txt`: added `qrcode` (ucpan-login 二维码渲染)
+- Skill count unchanged at 154
+
 ## [1.8.1] - 2026-10-15
 
 ### Changed

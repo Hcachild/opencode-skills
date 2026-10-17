@@ -8,11 +8,11 @@
   - 单文件多连接分块并发 + 多文件并行，突破单连接 ~100KB/s 限速
   - 断点续传（分块级）+ 直链过期自动刷新
   - --check 模式：逐文件探测匿名可下载性（可下载 / 需登录），下载前先摸清边界
-  - 支持提取码分享；如匿名受限可传 --cookie
+  - 凭证：--cookie 直接传；或先跑 ucpan-login.py 手机扫码一次（保存到 ~/.ucpan_cookie，本脚本自动检测使用）
 
 用法:
   python ucpan-dl.py <分享链接> [--out DIR] [--pwd 提取码] [--cookie "xx=yy"]
-                       [--jobs 3] [--chunks 16] [--only 正则] [--list] [--check]
+                       [--cookie-file PATH] [--jobs 3] [--chunks 16] [--only 正则] [--list] [--check]
 
 示例:
   python ucpan-dl.py "https://drive.uc.cn/s/ca97d20a92444?public=1#/list/share" --out .\out
@@ -60,6 +60,27 @@ def human(n: float) -> str:
             return f"{n:.1f}{u}"
         n /= 1024
     return f"{n:.1f}TB"
+
+
+def whoami(cookie: str) -> str | None:
+    try:
+        r = requests.post(
+            "https://fast.uc.cn/api/info?fr=pc&pr=UCBrowser",
+            json={"st": ""},
+            headers={
+                "Cookie": cookie,
+                "User-Agent": UA,
+                "Content-Type": "application/json",
+                "x-biz-retry": "0",
+            },
+            timeout=15,
+        )
+        d = r.json()
+        if d.get("success") and (d.get("data") or {}).get("nickname"):
+            return d["data"]["nickname"]
+    except Exception:
+        pass
+    return None
 
 
 def parse_share_id(url: str) -> str:
@@ -507,7 +528,8 @@ def main() -> None:
     ap.add_argument("url", help="分享链接，如 https://drive.uc.cn/s/xxxx")
     ap.add_argument("--out", default="ucpan-out", help="保存目录 (默认 ./ucpan-out)")
     ap.add_argument("--pwd", default="", help="提取码（如有）")
-    ap.add_argument("--cookie", default="", help="登录Cookie（可选）")
+    ap.add_argument("--cookie", default="", help="登录Cookie（可选；也可先跑 ucpan-login.py 扫码保存）")
+    ap.add_argument("--cookie-file", default="", help="从文件读取登录Cookie（不传时自动尝试 ~/.ucpan_cookie）")
     ap.add_argument("--jobs", type=int, default=3, help="并发下载文件数 (默认3)")
     ap.add_argument("--chunks", type=int, default=16, help="单文件分块并发数 (默认16)")
     ap.add_argument("--only", default="", help="只下载路径匹配该正则的文件")
@@ -515,11 +537,32 @@ def main() -> None:
     ap.add_argument("--check", action="store_true", help="仅探测各文件是否可下载（边界检查），不下载")
     args = ap.parse_args()
 
-    if args.cookie:
-        DL_HEADERS["Cookie"] = args.cookie
+    cookie = args.cookie.strip()
+    if not cookie and args.cookie_file:
+        try:
+            cookie = Path(args.cookie_file).read_text(encoding="utf-8-sig").strip()
+        except OSError as e:
+            log(f"[warn] 读取 cookie 文件失败: {e}")
+    if not cookie:
+        default_cookie = Path.home() / ".ucpan_cookie"
+        if default_cookie.exists():
+            try:
+                cookie = default_cookie.read_text(encoding="utf-8-sig").strip()
+            except OSError:
+                cookie = ""
+            if cookie:
+                log(f"[ok] 检测到已保存的登录凭证: {default_cookie}")
+    if cookie:
+        nick = whoami(cookie)
+        if nick:
+            log(f"[ok] 登录凭证有效（账号: {nick}）")
+            DL_HEADERS["Cookie"] = cookie
+        else:
+            log("[warn] 登录凭证无效/已过期，本次按匿名模式运行（运行 ucpan-login.py 可刷新）")
+            cookie = ""
 
     share_id = parse_share_id(args.url)
-    pan = UcPan(share_id, args.pwd, args.cookie)
+    pan = UcPan(share_id, args.pwd, cookie)
     pan.token()
 
     out_dir = Path(args.out)

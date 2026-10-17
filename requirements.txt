@@ -33,3 +33,6 @@ filelock>=3.16.0
 
 # ppt-design-skill: editable PPTX rendering engine
 pptx-designer>=1.0.0b8
+
+# ucpan-download: QR code rendering for ucpan-login.py
+qrcode>=7.4
