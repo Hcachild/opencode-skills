@@ -18,6 +18,27 @@ description: 'Run long-running iterative research/experiment campaigns as a nest
 
 不适合：单次线性任务；目标模糊、无法定义验收标准与平凡基线的任务。
 
+## 强度等级（默认 medium）
+
+用 `intensity` 控制队形、并发、预算与审计强度；详见 `references/intensity.md`。
+**等级越高越严格**，不能降低预注册/test 单次/技能门/会话备份等硬规则。
+
+| 等级 | 重槽并发 | 累计代理 | 墙钟 | 重槽时 | 典型场景 |
+|---|---:|---:|---|---:|---|
+| low | 4 | 1–8 | 15m–4h | 8–64 | 单点核查 |
+| **medium（默认）** | 16–32 | 30–80 | 1–3 天 | 500–2,000 | 小规模多假设筛选 |
+| high | **128** | 200–600 | 1–2 周 | 10,000–30,000 | 标准长跑研究 |
+| xhigh | 256–512 | 800–2,500 | 3–8 周 | 50,000–150,000 | 论文级/多中心攻坚 |
+| max | 1,024+ | 3,000–10,000 | 2–6 个月 | 200,000–800,000 | 探索型大科学/穷举 |
+| infinite | 弹性 1,024–4,096 | 20,000+ | 持续 | 滚动 10–50 万/月 | 常驻研究系统 |
+
+- 默认 **medium**；`init_swarm.py` 不传 `--intensity` 时按 medium 生成预算。
+- **任务粒度随强度上升**：low 问题/脚本级、medium 变体级、high 原子实验级（一个数据切片×模型×seed×split = 一个 worker）、xhigh 矩阵单元+独立复核、max 微假设、infinite 持续微任务。高等级用粗任务 = 代理空转；低等级切太细 = 协调爆炸。backlog 行数应≈任务数（medium 30–80、high 200–600、xhigh 800–2,500、max 3,000–10,000）。
+- **high 起需要 queue-master** 专管 128 重槽排队；xhigh 起接中央队列/多机调度，`heavy_lock.py` 只做本地闸门。
+- 强度是**上限**，不是必须用满；槽位不超卖，槽时到 80% 暂停派生、100% 硬停。
+- high+ 自检清单（批量 skill、嵌套链、session id、备份、NOTES）见 `references/intensity.md` §2.3。
+- 强度可按 track 覆盖（如 max 里跑 low 筛查 + high 验证），但升级只能由 sponsor 决定。
+
 ## 架构与角色
 
 ```
@@ -33,7 +54,17 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 - **重计算**另受物理槽限制（`locks/heavy_XX`，按机器核数定，如 ≤16），与代理并发无关
 - root 上下文将满时派生**继任 root**接棒（写 checkpoint、深度+1）
 
-**与批量处理 skill 协同**：若已安装批量处理 skill（如 `parallel-data-processing`），对**扁平的大批量同构工作**（逐条分类/提取/打标成千上万条数据）直接采用它的"切 N 片 → 每片一个 Task Agent 输出 JSON → 校验合并"模式（一个 manager 挂 N 个 worker 即可），不必为每个小项单开 track；层级 swarm 仍负责研究主线与治理。
+**与批量处理 skill 协同（high+ 强制检查）**：
+
+- 对**扁平的大批量同构工作**（成千上万条逐条分类/提取/打标/翻译/清洗/校验），使用 `parallel-data-processing` 的
+  "切分片 → 每片一个 Task Agent 输出 JSON → check-only 校验 → 合并"模式；一个 manager 挂 N 个 worker，
+  **不要为每条数据单开 track 或 worker**。
+- 档位要求：low 不适用；medium 可用；**high 起必须检查并按需使用**；xhigh 起随机 1–2% 分片双跑比对；
+  max/infinite 自动审计与去重。
+- 获取顺序：本地 `~/.config/opencode/skills/parallel-data-processing/` → 用户 GitHub（Hcachild）中的批量处理
+  skill/repo → 都没有则按同一模式手写分片/合并脚本（split → worker JSON → check → merge）。
+- 分片 10–50 条/worker，每批 20–30 个并行；结果写 `<SWARM>/batches/<batch_id>/{chunks,results,out}`，
+  不写仓库根；`manifest.json` 是回填与校验的唯一依据。
 
 ## 一次性基建（每个研究目标一套）
 
@@ -41,8 +72,8 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
    `subagent_depth`、`swarm-lead`（`task=true`，可派生）、`swarm-worker`（`task=false`，叶子）。
    **必须重启 opencode 生效**；重启后先做嵌套验证（spawn swarm-lead → 它再 spawn swarm-worker 落盘验证）。
 2. **定义验收标准与技能门**：什么算达标（指标+CI 要求）、必须打败哪些平凡基线（all-positive、简单规则、现状态）。目标值写进 CHARTER。
-3. 建 `docs/swarm<N>/`：`CHARTER.md`（使命/任务卡/技能门/反作弊/停止条件）、`PROTOCOL.md`（角色/路径/领取/锁/预算/记录契约）、`ROADMAP.md`（阶段/里程碑/首代种子/剪枝）——骨架见 `references/templates.md` §2–4，**入库并 commit**。
-4. 建 `swarm<N>/` 运行时（**gitignore**）：`state.json`、`agent_log.jsonl`、`backlog.jsonl`、`leaderboard.csv`、`checkpoints/`、`runs/`、`claims/`、`registry/`、`locks/`、`prereg/`、`test_uses.jsonl`、`tools/`（复制本技能 `scripts/append_jsonl.py`、`scripts/heavy_lock.py`）——schema 见 `references/templates.md` §5–9。
+3. 建 `docs/swarm<N>/`：`CHARTER.md`（使命/强度等级/任务卡/技能门/反作弊/停止条件）、`PROTOCOL.md`（角色/路径/领取/锁/预算/记录契约）、`ROADMAP.md`（阶段/里程碑/首代种子/剪枝）——骨架见 `references/templates.md` §2–4，**入库并 commit**。
+4. 建 `swarm<N>/` 运行时（**gitignore**）：`state.json`（含 `intensity` 与派生预算）、`agent_log.jsonl`、`backlog.jsonl`、`leaderboard.csv`、`checkpoints/`、`runs/`、`claims/`、`registry/`、`locks/`、`prereg/`、`test_uses.jsonl`、`tools/`（复制本技能 `scripts/append_jsonl.py`、`scripts/heavy_lock.py`、`scripts/session_map.py`、`scripts/session_backup.py`）、`sessions/`（会话 JSON 备份）——schema 见 `references/templates.md` §5–9。推荐用 `init_swarm.py --intensity medium` 一键生成。
 5. 运行时一律**绝对路径**；严禁在仓库根建 `runs/`、`track_notes/`（会污染 git 状态）。
 
 ## 代际循环（核心）
@@ -54,6 +85,45 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 2. **root 执行**：按波次派 lead（每 track 一条 lead→manager→worker 链）；维护 leaderboard/state/checkpoint；裁决冲突；达标或越限时写 `STOP`。
 3. **Sponsor 收口**：核对产物 → commit + push 仅 `docs/` 侧（experiments.md、charter 修订、交付报告；运行时永不入库，push 失败用重试循环）→ 向用户汇总 → 按停止条件决定：继续下一代 / 换任务卡 / 开新波次（新编号 swarm）/ 收敛交付。
 4. **每代先读上代 checkpoint** 再开局；不重复已证伪路径（维护"已关闭清单"）。
+
+### Task Agent 的 session id 与恢复保证（派生后立刻落盘）
+
+- `task` 工具返回的 `<task id="ses_...">` **就是子代理会话 id，也是续跑用的 `task_id`**（2026-10-22 在 opencode 1.19.x 实测：同一 id 续跑，上下文保留）。
+- **双保险落盘**：子代理开工用 `run_token` 自报后立即写自己的 `runs/<agent_id>/SESSION_ID`（一行 `ses_...`，不等结束）；父代理在 `task` 返回后把 `agent_id → session_id` 追加进 `agent_log.jsonl`（`event=spawn`）。
+- 子代理需要知道自己的 id：prompt 里带唯一 `run_token=<swarm>-g<G>-<agent_id>-<8hex>`，开工先运行
+  `python <SWARM>/tools/session_map.py self --token <run_token>`，把输出的 `SESSION_ID`/`PARENT_ID` 写进 NOTES 与回报。
+- 父代理/接棒者丢了链路时按会话树恢复（只读 DB，opencode 运行中也可用）：
+  `python <SWARM>/tools/session_map.py children --parent <session_id>`
+  或 `opencode db "select id,parent_id,agent,title from session where parent_id='<sid>' order by time_created" --format json`。
+- **找不到就用 token 反查**：`session_map.py self --token <run_token>` 或 `session_map.py agent --agent-id <agent_id>`。
+- **不要用 `opencode session list` 找子代理**（实测只列主会话）；**不要按 `time_updated` 猜**（并发会话会串到别人）。
+- 恢复一律用 `task` 工具 `task_id=<ses_...>`（不是自造的 agent_id）；每代 checkpoint 的"在途代理"表要记录 session id。
+
+#### 恢复保证与边界（2026-10-22 实测，opencode 1.19.x）
+
+| 场景 | 实测结果 |
+|---|---|
+| 子代理当前轮被 abort/cancel | 同 session id + "继续" 可恢复，口令/上下文保留 |
+| `task` 被外部打断 | 返回 `Task cancelled`，**不带 `<task id>`**；必须靠子代理开工写的 `SESSION_ID` / token 反查 |
+| 新客户端进程接续（`opencode run --attach -s <ses_...>`） | 同一会话可继续（历史从 DB 读取） |
+| 删除父会话 | **级联删除全部子会话**；token/children 均查不到 |
+| 用已删除的 `task_id` 续跑 | `task` **静默新建**一个 session（返回头 id ≠ 请求 id），看似成功但上下文为空 |
+| 会话被删/DB 损坏且无备份 | 不能恢复同一会话，只能按 NOTES/checkpoint 重建 |
+| 有 `opencode export` 备份 | `opencode import` 实测恢复**同一 session id** 与完整历史（父会话已删的孤儿子会话也可单独恢复） |
+
+- **续跑后必须核对返回头 id**：`task` 返回 `<task id="A">`，若 A ≠ 请求的 `task_id` → 原会话已不在，你拿到的是全新空会话；立即停手，改走备份 import 或重建 brief，别在空会话里继续干活。
+
+**结论：不是 100%。** 正常中断（abort/取消/进程重启）可稳定恢复同一会话；删除会话/DB 损坏属于不可恢复，除非有导出备份。因此：
+
+- **会话备份**：每代 checkpoint 或收口时执行
+  `python <SWARM>/tools/session_backup.py export-state --swarm <SWARM>`
+  （写 `<SWARM>/sessions/<agent_id>.json`）；也可 `export-tree --root <root_session>` 备份整棵会话树。删除任何会话前先
+  `session_backup.py export --session <ses_...> --agent-id <id> --out-dir <SWARM>/sessions`。
+  恢复：`python <SWARM>/tools/session_backup.py import --file <...>.json`。
+  备份是**导出时的快照**（运行中会话可能缺最后一轮），关键结论仍必须落 NOTES。
+- **禁删会话**：swarm 运行/收尾期间不要删除任何父/子会话。
+- **同一会话 ≠ 记得所有细节**：长会话会 compact/截断，恢复后可能丢中间细节；关键状态必须落 NOTES/checkpoint，恢复时以文件为准。
+- 兜底永远是 **NOTES + checkpoint + agent_log**：会话没了也能重建任务，只是不是同一对话。
 
 ### 停止条件（写进 CHARTER）
 
@@ -70,9 +140,9 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 5. **领取独占**：`claims/<task_id>.claim` 原子创建；>6h 视为死领取，改名 `.stale` 后重抢。
 6. **重计算抢槽**：`scripts/heavy_lock.py` 物理槽；无槽先做轻任务或等待，禁止裸跑重训练。
 7. **写权分离**：worker 只写自己 `runs/<agent_id>/`；lead 只写本 track；root 独占 `state/leaderboard/checkpoints`；代理均不改共享代码、不 git——只有 sponsor 收口时 commit。
-8. **预算硬闸**：每次派生前后核对 `agent_log` 行数、runs 数、重任务小时、STOP 是否存在；任一越限 → 停派生、写 checkpoint、退出。
+8. **预算硬闸**：每次派生前后核对 `agent_log` 行数、runs 数、重槽占用/槽时、并发代理数、`intensity_profile` 上限、STOP 是否存在；任一越限 → 停派生、写 checkpoint、退出。
 9. **诚实报告**：流行度/检测混入等伪影必须披露并冻结；证伪路径入"已关闭清单"防止回头；假 STOP 要撤销。
-10. **记录契约**：worker 落 `NOTES.md`（目标/数据版本/命令/结果+CI/产物/结论/新假设）；返回父代理最终消息 ≤40 行。
+10. **记录契约**：worker 落 `NOTES.md`（目标/数据版本/命令/结果+CI/产物/结论/新假设/`SESSION_ID`）；返回父代理最终消息 ≤40 行；父代理记录子代理 `<task id="ses_...">`。
 
 （完整运行时契约与评估协议见 `references/protocol.md`。）
 
@@ -80,11 +150,18 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 
 1. **盘点现场**（只读）：`state.json`、`agent_log.jsonl` 尾部、`runs/` 新增目录、`claims/*.claim`、`locks/*.lock`、`STOP`。
 2. **恢复 Task Agent 对话（首选、极简）**：
-   - 用原 `task_id` 恢复同一子代理会话，prompt 就一句 **"继续"**——它的上下文还在，自己知道做到哪、下一步是什么；**非必要不要回复一大堆话**（重发背景/规格浪费 token，还可能打乱它）。
+   - 用原 `task_id=<ses_...>`（= 子代理 session id）恢复同一会话，prompt 就一句 **"继续"**——它的上下文还在，自己知道做到哪、下一步是什么；**非必要不要回复一大堆话**（重发背景/规格浪费 token，还可能打乱它）。
+   - session id 来源优先级：`runs/<agent_id>/SESSION_ID` / `agent_log.jsonl` 的 `session_id` 字段 → `session_map.py children --parent <sid>`（沿 `parent_id` 树）→ `session_map.py self --token <run_token>`（token 在 prompt 里）。
+   - 若 `task` 返回的是 `Task cancelled`（**没有 id**，实测外部中断即如此）：立刻用上面三条反查，别把它当成"会话丢了"。
+   - **续跑后核对返回头 `<task id="...">` 是否等于请求的 `task_id`**；不等 = 原会话已丢失，工具静默新建了空会话。
    - 只在需要纠偏/补充约束时加最少一句（如 `继续；先收尾再回报`）。
    - **嵌套链逐级恢复**：root 恢复后，让 root 用同样方式（"继续"）恢复它派生的 lead/manager/worker；sponsor 不要替 root 重写整套 brief。
-   - 兜底：仅当原会话/task_id 不可恢复时，才发重建 brief（`references/prompts.md` §5 兜底模板，只附最少必要事实、声明"已完成项无需重跑"）。
-3. **清理与收尾**：清残留 claims/locks（`.stale` 后重抢），补齐 checkpoint/leaderboard/state，完成在途任务卡，再继续下一代。
+   - **会话已被删除/查不到**：先看 `<SWARM>/sessions/<agent_id>.json`，有备份就
+     `session_backup.py import --file <...>`（实测恢复同一 session id），再按原 id "继续"；
+     没有备份才发重建 brief（`references/prompts.md` §5 兜底模板，只附最少必要事实、声明"已完成项无需重跑"）。
+   - **主会话（sponsor/root）恢复**：TUI 用 `opencode -s <ses_...>`；命令行用
+     `opencode run --attach <server> -s <ses_...> "继续"`（实测新进程可从 DB 接续同一会话）。
+3. **清理与收尾**：清残留 claims/locks（`.stale` 后重抢），补齐 checkpoint/leaderboard/state，完成在途任务卡，再继续下一代。删除任何会话前必须先 export。
 
 ## 常见坑
 
@@ -95,11 +172,19 @@ Sponsor（主会话，你自己）        —— 建宪章、发 root brief、�
 - 不抢槽直接上重训练 → 机器过载、任务互相拖死。
 - 每代只汇报数字不落盘 → 无法恢复/复现；NOTES + checkpoint 是硬契约。
 - 恢复时重发大段 brief → 浪费 token 还可能打乱子代理；优先对原会话说"继续"。
+- 不知道子代理 session id → `task` 返回头 `<task id="ses_...">` 就是；派生后立刻落盘，丢了用 `session_map.py` 反查（别用 `opencode session list`，它不列子代理）。
+- 以为"有 task_id 就 100% 能恢复" → 删除父会话会**级联删除子会话**，DB 损坏/裸删也救不回；必须 checkpoint 导出 `sessions/*.json`，并以 NOTES 为最终兜底。
+- 强度虚标：用 high 的代理数却不给 128 槽/审计/恢复节奏 → 只会更快产出不可信结果；按 `references/intensity.md` 配齐再升档。
 - 一开始就拉满预算 → 先跑 1–2 代观测真实成本与产出价值，再决定加码（**价值耗尽可能早于预算耗尽**）。
 
 ## 配套文件
 
+- `references/intensity.md` —— 强度等级 low/medium/high/xhigh/max/infinite（默认 medium）：槽位/槽时/代理量/审计/恢复/治理
 - `references/protocol.md` —— 运行时契约完整版（角色/目录/领取/锁/预算/记录/评估/停止/接棒）
 - `references/prompts.md` —— 各角色 prompt 模板（root/lead/manager/worker/恢复/嵌套验证）
 - `references/templates.md` —— 宪章骨架 + state/backlog/leaderboard/checkpoint/NOTES/预注册卡模板 + config 片段
 - `scripts/append_jsonl.py`、`scripts/heavy_lock.py` —— 并发安全 JSONL 追加与物理重任务槽
+- `scripts/session_map.py` —— 用 run_token / 父会话 id / agent_id 反查 Task Agent 的 session id（读 opencode SQLite，只读安全）
+- `scripts/session_backup.py` —— `opencode export/import` 封装：按 state.active_sessions 批量备份、恢复同一 session id
+- **依赖（high+ 必须检查）**：`parallel-data-processing` skill（本地 `~/.config/opencode/skills/parallel-data-processing/`；
+  缺失时到用户 GitHub Hcachild 找，或按同模式手写 split/merge）

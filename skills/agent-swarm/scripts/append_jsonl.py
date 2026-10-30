@@ -6,7 +6,7 @@
     python append_jsonl.py <path> '<json>'     # 追加一行（校验合法性）
     python append_jsonl.py --count <path>      # 打印现有行数（用于预算核对）
 
-规则: 单行 JSON；失败（超时/非法 JSON）非零退出。
+规则: 单行 JSON；缺 ts 时自动补本地时区时间；失败（超时/非法 JSON）非零退出。
 """
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ import json
 import os
 import sys
 import time
+from datetime import datetime
 
 
 def append_line(path: str, obj: dict) -> None:
@@ -63,6 +64,7 @@ def main() -> None:
     obj = json.loads(sys.argv[2])  # 校验合法 JSON
     if not isinstance(obj, dict):
         sys.exit("json 必须是对象")
+    obj.setdefault("ts", datetime.now().astimezone().isoformat(timespec="seconds"))
     append_line(sys.argv[1], obj)
 
 

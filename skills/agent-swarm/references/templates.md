@@ -37,6 +37,10 @@
 ```markdown
 # Swarm<N> Charter — <使命一句话>（v1，所有代理必读）
 
+- intensity: <low|medium|high|xhigh|max|infinite>（默认 medium）
+- granularity: <question|variant|atomic-experiment|matrix-cell+replication|micro-hypothesis|continuous-microtask>
+- intensity_rationale: <一句话：为什么这个等级>
+
 ## 1. 使命
 <研究问题、数据集、为什么做、成功定义（指标+CI+技能门+复现要求）>
 
@@ -51,6 +55,7 @@
 | ... | ... | ... | ... | ... |
 
 ## 4. 晋级与停止
+- 强度档位与预算：见 `state.intensity_profile`；升降档规则见 `references/intensity.md` §6
 - 每任务输出：prevalence、baseline、主指标+CI、required、headroom、判定
 - 晋级：headroom 高/可及 → 深挖（特征/模型/锚点/严重度设定扫描）
 - 停止：① 主目标达成 ② 穷举证伪/多代无新达标 ③ 预算触顶 ④ 用户 STOP
@@ -98,23 +103,55 @@
 {
   "phase": "swarm<N>",
   "generation": 0,
+  "intensity": "medium",
+  "intensity_profile": {
+    "max_parallel_agents": 30,
+    "max_heavy_slots": 32,
+    "granularity": "variant",
+    "batch_policy": "optional",
+    "batch_shard_size": 10,
+    "batch_parallel": 10,
+    "seeds": 3,
+    "splits": 2,
+    "audit": "one-audit-track",
+    "human_gate_every": 3,
+    "checkpoint_every": "generation",
+    "backup_every": "generation",
+    "budget_window": "campaign"
+  },
   "agents_launched": 0,
   "experiments_done": 0,
   "heavy_hours_used": 0.0,
-  "budget": { "max_agents": 10000, "max_experiments": 5000, "max_heavy_hours": 600, "max_generations": 300 },
+  "budget": { "max_agents": 80, "max_experiments": 500, "max_heavy_hours": 2000, "max_generations": 3 },
   "started": "YYYY-MM-DD",
   "status": "boot | running | innovation-phase | stopped | converged",
-  "primary_goal": "<一句话>"
+  "primary_goal": "<一句话>",
+  "active_sessions": { "<agent_id>": "ses_..." }
 }
 ```
+
+> 上面的数字是 **medium** 默认档。其他档位见 `references/intensity.md`；`init_swarm.py --intensity` 会自动写入。
 
 **backlog.jsonl**（每行一个任务，owner 只改自己条目）：
 
 ```json
 {"id": "V001", "track": "meta", "priority": 1, "status": "ready|claimed|done|frozen", "heavy": false,
+ "granularity": "variant|atomic-experiment|audit|micro|batch-shard", "parent_task": "V000",
  "spec": "任务描述（可执行）", "inputs": ["路径/表"], "accept": "验收标准", "budget_min": 90,
  "result": "DONE: 关键数字; fp12 ...  或  KILL: 原因"}
 ```
+
+> 粒度由 `state.intensity_profile.granularity` 决定；high+ 的每个原子单元必须独立一行、独立 fp12。
+
+**batches/<batch_id>/manifest.json**（批量同构任务，high+；由 split 脚本生成）：
+
+```json
+{"batch_id": "B001", "source": "data.xlsx", "rule_version": "v1", "shard_size": 10,
+ "shards": [{"chunk": "chunk_001.txt", "ids": ["sheet:R2", "sheet:R3"], "n": 2}]}
+```
+
+> 校验/回填只认 manifest；一个分片一个 claim，`fp12 = sha1(manifest|chunk|rule)[:12]`。
+> 结果写 `results/chunk_XXX.json`，check-only 通过后才允许 merge 到 `out/`。
 
 **leaderboard.csv** 建议列头：
 
@@ -129,8 +166,14 @@ headroom,headroom_class,green,validated,split,source,notes
 ```json
 {"ts": "2026-10-06T14:49:46+08:00", "parent_id": "swarm-root-gen1", "task_id": "V001",
  "event": "spawn|done|decision|stop", "agent_id": "g1-v001-lead", "role": "lead",
- "track": "meta", "detail": "dispatched by root gen1 (wave1)"}
+ "run_token": "swarm1-g1-V001-lead-8hex", "session_id": "ses_...",
+ "parent_session_id": "ses_...", "track": "meta",
+ "detail": "dispatched by root gen1 (wave1)"}
 ```
+
+> `session_id` 取 `task` 工具返回头 `<task id="ses_...">`，它与续跑用的 `task_id` 是同一个值；
+> 派生返回后立刻追加，并写 `runs/<agent_id>/SESSION_ID`。`event=done` 行也带同一个 `session_id`。
+> `run_token` 是恢复兜底：`session_map.py self --token <run_token>` / `agent --agent-id <agent_id>` 可反查。
 
 **test_uses.jsonl**（planned→used 两行，fp12 相同）：
 
@@ -155,6 +198,15 @@ headroom,headroom_class,green,validated,split,source,notes
 ## 1. 执行与预算
 <波次/链数/代理数/实验数/heavy 小时/test_uses 与 registry 对账>
 
+### 在途/本代代理（恢复用）
+| agent_id | role | session_id (ses_...) | 状态 | 产物 |
+|---|---|---|---|---|
+| ... | ... | ... | running/done/lost | ... |
+
+### 会话备份
+- `session_backup.py export-state` 执行时间/结果：<...>
+- `<SWARM>/sessions/` 文件数/总大小：<...>
+
 ## 2. 本代结果（每任务一行：prev / 指标+CI / 基线 / required / headroom / 判定）
 
 ## 3. 审计与 root 裁决（关键裁决编号 R-...）
@@ -169,7 +221,7 @@ headroom,headroom_class,green,validated,split,source,notes
 ```markdown
 # <agent_id> — <任务一句话>
 
-- agent_id/role/parent/root/task_id/track；日期；纪律声明（未触 test/未 git/raw 只读）
+- agent_id/role/parent/root/task_id/track/run_token/SESSION_ID；granularity（原子单元）/fp12；日期；纪律声明（未触 test/未 git/raw 只读）
 - 耗时；heavy 槽 acquire/release 时间；产物路径
 
 ## 脚本与命令（新增，未改既有）
@@ -211,7 +263,9 @@ repo/
 │   ├── state.json  agent_log.jsonl  backlog.jsonl  leaderboard.csv  test_uses.jsonl  STOP
 │   ├── checkpoints/gen_*.md
 │   ├── claims/  registry/  locks/  prereg/  tracks/  track_notes/
-│   ├── runs/<agent_id>/{NOTES.md, metrics.json, cmd.txt, artifacts/}
-│   └── tools/{append_jsonl.py, heavy_lock.py}
+│   ├── runs/<agent_id>/{NOTES.md, metrics.json, cmd.txt, SESSION_ID, artifacts/}
+│   ├── sessions/<agent_id>.json      # opencode export 备份（同 id 可 import 恢复）
+│   ├── batches/<batch_id>/{chunks,results,out,manifest.json}   # 批量同构任务（high+）
+│   └── tools/{append_jsonl.py, heavy_lock.py, session_map.py, session_backup.py}
 └── .gitignore                # 确保 swarm<N>/ 整体忽略
 ```
