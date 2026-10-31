@@ -17,6 +17,7 @@ param(
 $ErrorActionPreference = "Stop"
 $script:Enc = [System.Text.Encoding]::GetEncoding(28591)
 $script:LogDir = Join-Path $env:LOCALAPPDATA "opencode-retry-patch"
+$script:Cleanup = @()
 $script:Marker = "https://opencode.ai/go"
 $script:Utf8 = New-Object System.Text.UTF8Encoding($false)
 
@@ -357,9 +358,10 @@ function Start-ApplyWorker {
     if (-not $shell) { throw "PowerShell executable not found" }
     $targetKey = (Get-HashHex ([System.Text.Encoding]::UTF8.GetBytes($TargetFile.ToLowerInvariant()))).Substring(0,8)
     $taskName = "OpenCodeRetryPatch-" + $OldHash.Substring(0,8) + "-" + $targetKey
-    $shadow = Join-Path $dir "apply-worker.ps1"
+    $shadow = Join-Path $dir ("apply-worker-" + $OldHash.Substring(0,8) + "-" + $targetKey + ".ps1")
     if ($PSCommandPath -ne $shadow) { Copy-Item -LiteralPath $PSCommandPath -Destination $shadow -Force }
     $workerConfig = Join-Path $dir ("apply-" + $OldHash.Substring(0,8) + "-" + $targetKey + ".json")
+    $cmdPath = Join-Path $dir ("apply-" + $OldHash.Substring(0,8) + "-" + $targetKey + ".cmd")
     $configData = [ordered]@{
         Target = $TargetFile
         Patched = $TempFile
@@ -367,11 +369,11 @@ function Start-ApplyWorker {
         ExpectedNewHash = $NewHash
         LogFile = $workerLog
         TaskName = $taskName
+        Cleanup = @($workerConfig, $shadow, $cmdPath)
     }
     $configJson = $configData | ConvertTo-Json -Depth 4
     [System.IO.File]::WriteAllText($workerConfig, $configJson, (New-Object System.Text.UTF8Encoding($false)))
     $argLine = "`"$shell`" -NoProfile -NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$shadow`" -WaitAndReplace -WorkerConfig `"$workerConfig`""
-    $cmdPath = Join-Path $dir ("apply-" + $OldHash.Substring(0,8) + "-" + $targetKey + ".cmd")
     $cmdContent = "@echo off`r`n$argLine`r`n"
     [System.IO.File]::WriteAllText($cmdPath, $cmdContent, [System.Text.Encoding]::Default)
     $startTime = (Get-Date).AddMinutes(1).ToString("HH:mm")
@@ -395,33 +397,39 @@ function Install-PatchedFile {
     param([string]$TargetFile, [string]$TempFile, [string]$OldHash, [string]$NewHash)
     if (-not (Test-Writable $TargetFile)) { return "locked" }
     $backup = $null
-    $replaceBackup = $null
     if (-not $NoBackup) {
         $backup = "$TargetFile.$($OldHash.Substring(0,12)).retrybak"
         if (-not (Test-Path -LiteralPath $backup)) {
             Copy-Item -LiteralPath $TargetFile -Destination $backup -Force
             Write-Log "Backup: $backup"
         }
-        $replaceBackup = $backup
-    } else {
-        $replaceBackup = "$TargetFile.replace-backup"
     }
+    $newBytes = [System.IO.File]::ReadAllBytes($TempFile)
+    $fs = [System.IO.File]::Open($TargetFile, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Write, [System.IO.FileShare]::Read)
     try {
-        [System.IO.File]::Replace($TempFile, $TargetFile, $replaceBackup)
-        $actual = Get-FileHashHex $TargetFile
-        if ($actual -ne $NewHash) { throw "Installed file hash mismatch" }
-        Write-Log "Patched: $TargetFile"
-        return "applied"
+        $fs.Position = 0
+        $fs.Write($newBytes, 0, $newBytes.Length)
+        $fs.SetLength($newBytes.Length)
+        $fs.Flush($true)
     } finally {
-        if ($NoBackup -and $replaceBackup -and (Test-Path -LiteralPath $replaceBackup)) {
-            Remove-Item -LiteralPath $replaceBackup -Force -ErrorAction SilentlyContinue
-        }
+        $fs.Dispose()
     }
+    $actual = Get-FileHashHex $TargetFile
+    if ($actual -ne $NewHash) { throw "Installed file hash mismatch" }
+    Remove-Item -LiteralPath $TempFile -Force -ErrorAction SilentlyContinue
+    Write-Log "Patched: $TargetFile"
+    return "applied"
 }
 
 function Exit-Worker {
     param([int]$Code)
     Remove-ApplyTask $TaskName
+    foreach ($path in @($script:Cleanup)) {
+        if (-not $path) { continue }
+        try {
+            if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force -ErrorAction Stop }
+        } catch { }
+    }
     exit $Code
 }
 
@@ -434,6 +442,7 @@ function Invoke-WaitAndReplace {
         $ExpectedNewHash = $cfg.ExpectedNewHash
         $LogFile = $cfg.LogFile
         $TaskName = $cfg.TaskName
+        $script:Cleanup = @($cfg.Cleanup | Where-Object { $_ })
     }
     $deadline = (Get-Date).AddHours(24)
     while ((Get-Date) -lt $deadline) {

@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.3] - 2026-10-31
+
+### Changed
+- Updated `opencode-retry-patch` — final install now writes the binary in place, preserving npm's hardlink and avoiding a duplicate ~200 MB `opencode.exe`; scheduled worker cleans its JSON/shadow/CMD after applying
+
 ## [1.9.2] - 2026-10-31
 
 ### Added

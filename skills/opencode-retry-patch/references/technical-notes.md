@@ -31,6 +31,8 @@ The retry code is inside one bundled chunk (for example `chunk-*.js`). Because t
 
 The scripts locate the retry block by the stable `https://opencode.ai/go` marker, not by line numbers, so they survive most 1.x minifier changes. On 1.18.16 the retry cap does not exist; the scripts patch only the delay constants.
 
+The final install writes the patched bytes **in place** rather than using `File.Replace`. This preserves npm's hardlink between `opencode-ai/bin/opencode.exe` and `opencode-windows-x64/bin/opencode.exe`, so no duplicate 200 MB binary is left behind.
+
 ## Desktop (`app.asar`)
 
 The desktop app is Electron. `resources/app.asar` has a Pickle-based header:
@@ -54,6 +56,8 @@ The CLI binary is locked while opencode runs. The patch script:
 4. The worker waits for the binary to unlock, verifies the old and new hashes, creates `*.retrybak`, replaces the binary, then deletes the scheduled task.
 
 The shadow + JSON approach avoids command-line encoding problems when the skill lives under a non-ASCII path (for example `D:\tool\opencode重试解除`). Do not put the original script path directly into the scheduled task action.
+
+On success (or abort) the worker removes its JSON config, per-task shadow script, and task CMD. The only file left in `%LOCALAPPDATA%\opencode-retry-patch` is the apply log.
 
 ## E2E semantics
 

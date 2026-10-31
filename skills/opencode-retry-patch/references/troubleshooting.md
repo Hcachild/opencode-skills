@@ -10,7 +10,7 @@ Get-ChildItem "$env:LOCALAPPDATA\opencode-retry-patch"
 Get-Content "$env:LOCALAPPDATA\opencode-retry-patch\apply-*.log" -Tail 50
 ```
 
-Exit all opencode processes. The task applies and deletes itself. If it does not:
+Exit all opencode processes. The task applies, deletes itself, and removes its JSON/shadow/CMD files; only `apply-*.log` remains. If it does not:
 
 ```powershell
 schtasks /Query /TN "OpenCodeRetryPatch-<hash>-<path>" /FO LIST /V
