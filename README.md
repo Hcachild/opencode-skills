@@ -1,6 +1,6 @@
 # opencode-skills
 
-Personal collection of 154 opencode agent skills.
+Personal collection of 155 opencode agent skills.
 
 ## Quick Start
 
@@ -105,7 +105,7 @@ opencode-skills/
 └── README.md            # This file
 ```
 
-## Skill Index (154 skills)
+## Skill Index (155 skills)
 
 | # | Skill | Description |
 |---|-------|-------------|
@@ -263,4 +263,5 @@ opencode-skills/
 | 152 | [writing-great-skills](skills/writing-great-skills) | Reference for writing and editing skills well — the vocabulary and principles that make a skill pred... |
 | 153 | [writing-plans](skills/writing-plans-0.1.0) | Use when you have a spec or requirements for a multi-step task, before touching code |
 | 154 | [writing-shape](skills/writing-shape) | Writing, exploit — shape raw material into an article, paragraph by paragraph. |
+| 155 | [opencode-retry-patch](skills/opencode-retry-patch) | Patch OpenCode 1.x CLI/desktop so network and content-filter errors retry indefinitely with a 5-minute backoff cap. |
 

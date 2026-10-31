@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-10-31
+
+### Added
+- `opencode-retry-patch` — 解除 OpenCode 1.x CLI/桌面端 5 次重试上限，单次指数退避上限 5 分钟，content filter 响应也进入重试；含 CLI/桌面补丁、延迟替换、备份/恢复与 E2E 脚本
+
+### Changed
+- Skill count from 154 to 155, regenerated README index
+
 ## [1.9.1] - 2026-10-17
 
 ### Changed
