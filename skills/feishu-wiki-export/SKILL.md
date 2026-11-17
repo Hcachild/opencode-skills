@@ -15,8 +15,11 @@ description: 递归导出飞书（Lark）知识库/Wiki 为本地 Markdown 完�
   1. 环境变量 `FEISHU_APP_ID` / `FEISHU_APP_SECRET`
   2. feishu-common 旁的 `config.json`（即 `~/.agents/skills/config.json`）
   3. 自动回退搜索 `~/.agents/skills/feishu-doc-*/config.json`、`~/.config/opencode/skills/feishu-doc-*/config.json`
+- 多应用切换：设置环境变量 `FEISHU_APP=<名字>` 后，上述各位置改读 `config.<名字>.json`
+  （例如公司租户应用放在 `~/.agents/skills/config.company.json`，运行时 `FEISHU_APP=company node scripts/export_wiki.js ...`）。
+  token 缓存已按 app_id 隔离，切换应用不会串用旧 token。
 
-飞书应用需开通权限：`wiki:wiki:readonly`、`docx:document:readonly`、`drive:drive:readonly`（读图片/附件）、`sheets:spreadsheet:readonly`；并把应用加入知识库成员（否则报 `code=131006`）。
+飞书应用需开通权限：`wiki:wiki:readonly`、`docx:document:readonly`、`drive:drive:readonly`（读图片/附件）、`sheets:spreadsheet:readonly`、`bitable:app:readonly`（导 bitable）；并把应用加入知识库成员（否则报 `code=131006`）。
 
 ## 用法
 
@@ -45,11 +48,14 @@ node scripts/export_wiki.js --token J5rkwc0JfiAOXGkzPnucGqstnqh --out D:\backup\
 | 代码块 | ` ``` ` 围栏 |
 | 表格（含合并单元格） | Markdown 表格（单元格内换行用 `<br>`） |
 | 图片 / 附件 | 下载到 `images/` / `files/`，正文相对路径引用 |
-| 文档内嵌电子表格（sheet 块）/ 独立 sheet 节点 | 各工作表导出为 Markdown 表格（前 300 行非空数据，超出有截断提示） |
+| 文档内嵌电子表格（sheet 块） | 每个块仅导出其引用的那一个工作表（同一表格被引用多次不会重复整表导出） |
+| 独立 sheet 节点 | 全部工作表导出为 Markdown 表格（前 300 行非空数据，超出有截断提示） |
 | 流程图/Mermaid（add-on 块） | ` ```mermaid ` 围栏 |
 | mention 文档/用户/群、公式 | 链接/文本 |
 | 旧版 doc 节点 | raw_content 纯文本回退 |
-| bitable 等其它类型 | 占位提示（不支持） |
+| file 节点（上传的附件型节点） | 下载**原文件**到节点目录，md 内含本地链接 |
+| bitable 节点 | 各数据表记录导出为 Markdown 列表（字段扁平化：`字段: 值`） |
+| mindnote（思维笔记） | 不支持——飞书开放 API 无导出接口，仅写占位提示 |
 
 ## 行为与注意
 
@@ -57,4 +63,4 @@ node scripts/export_wiki.js --token J5rkwc0JfiAOXGkzPnucGqstnqh --out D:\backup\
 - 串行请求 + 指数退避重试；权限类错误（131006/131005/131002）立即报出。
 - 结束时打印 `total/ok/failed/warnings` 统计；存在失败时退出码为 1，失败清单以 JSON 打印。
 - 大知识库（数百节点）耗时按分钟计；中断后直接重跑即可。
-- token 缓存位于 `~/.agents/skills/memory/feishu_token.json`（feishu-common 管理）。
+- token 缓存位于 `~/.agents/skills/memory/feishu_token.json`（feishu-common 管理；文件内记录 app_id，跨应用切换时会自动重新取 token，不会串用）。

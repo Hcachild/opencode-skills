@@ -30,8 +30,9 @@ Options:
 
 Credentials are resolved from:
   1. FEISHU_APP_ID / FEISHU_APP_SECRET environment variables
-  2. config.json next to feishu-common (e.g. ~/.agents/skills/config.json)
-  3. feishu-doc-*/config.json under ~/.agents/skills or ~/.config/opencode/skills
+  2. config[.<FEISHU_APP>].json next to feishu-common (e.g. ~/.agents/skills/config.json;
+     with FEISHU_APP=company it looks for config.company.json)
+  3. feishu-doc-*/config[.<FEISHU_APP>].json under ~/.agents/skills or ~/.config/opencode/skills
 `);
 }
 
@@ -72,19 +73,24 @@ function findFeishuCommon() {
 
 function loadCredentials(commonPath) {
   if (process.env.FEISHU_APP_ID && process.env.FEISHU_APP_SECRET) return;
+  const profile = (process.env.FEISHU_APP || '').trim();
+  if (profile && !/^[A-Za-z0-9_-]+$/.test(profile)) {
+    throw new Error('Invalid FEISHU_APP name (letters/digits/-/_ allowed): ' + profile);
+  }
+  const fileName = profile ? 'config.' + profile + '.json' : 'config.json';
   const readDirSafe = d => { try { return fs.readdirSync(d); } catch (e) { return []; } };
   const skillRoots = [
     path.join(os.homedir(), '.agents', 'skills'),
     path.join(os.homedir(), '.config', 'opencode', 'skills'),
   ];
   const candidates = [
-    path.join(path.dirname(commonPath), '..', 'config.json'),
-    path.join(path.dirname(commonPath), 'config.json'),
+    path.join(path.dirname(commonPath), '..', fileName),
+    path.join(path.dirname(commonPath), fileName),
   ];
   for (const root of skillRoots) {
-    candidates.push(path.join(root, 'config.json'));
+    candidates.push(path.join(root, fileName));
     for (const name of readDirSafe(root)) {
-      if (name.startsWith('feishu-doc')) candidates.push(path.join(root, name, 'config.json'));
+      if (name.startsWith('feishu-doc')) candidates.push(path.join(root, name, fileName));
     }
   }
   for (const c of candidates) {
@@ -97,7 +103,7 @@ function loadCredentials(commonPath) {
       }
     } catch (e) {}
   }
-  throw new Error('Feishu credentials not found. Set FEISHU_APP_ID / FEISHU_APP_SECRET or create config.json (e.g. ~/.agents/skills/config.json with app_id/app_secret).');
+  throw new Error('Feishu credentials not found. Set FEISHU_APP_ID / FEISHU_APP_SECRET or create ' + fileName + ' (e.g. ~/.agents/skills/' + fileName + ' with app_id/app_secret).');
 }
 
 async function api(url, opts = {}, retries = 5) {
@@ -178,19 +184,23 @@ async function renderInline(elements) {
   let out = '';
   for (const el of elements || []) {
     if (el.text_run) {
-      let t = el.text_run.content || '';
+      const raw = el.text_run.content || '';
       const st = el.text_run.text_element_style || {};
       if (st.link && st.link.url) {
         let url = st.link.url;
         try { url = decodeURIComponent(url); } catch (e) {}
-        out += '[' + escapeInline(t) + '](' + url + ')';
+        out += '[' + escapeInline(raw) + '](' + url + ')';
         continue;
       }
-      if (st.inline_code) t = '`' + t.replace(/`/g, '\\`') + '`';
+      if (st.inline_code) {
+        out += '`' + raw.replace(/`/g, '\\`') + '`';
+        continue;
+      }
+      let t = escapeInline(raw);
       if (st.bold) t = '**' + t + '**';
       if (st.italic) t = '*' + t + '*';
       if (st.strikethrough) t = '~~' + t + '~~';
-      out += escapeInline(t);
+      out += t;
     } else if (el.mention_doc) {
       const m = el.mention_doc;
       out += '[' + escapeInline(m.title || '文档') + '](' + (m.url || BASE_URL + '/docx/' + m.token) + ')';
@@ -403,10 +413,11 @@ class DocRenderer {
   async renderSheet(b) {
     const fullToken = b.sheet && b.sheet.token;
     if (!fullToken) return;
-    const sp = fullToken.split('_')[0];
+    const [sp, sheetId] = fullToken.split('_');
     try {
       const sheets = await listWorksheets(sp);
-      for (const sh of sheets) {
+      const picked = sheetId ? sheets.filter(s => s.sheet_id === sheetId) : [];
+      for (const sh of (picked.length ? picked : sheets)) {
         await dumpWorksheet(this.lines, sp, sh);
       }
     } catch (e) {
@@ -434,9 +445,13 @@ class DocRenderer {
   }
 }
 
+const sheetListCache = new Map();
 async function listWorksheets(spToken) {
+  if (sheetListCache.has(spToken)) return sheetListCache.get(spToken);
   const meta = await api('https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/' + spToken + '/sheets/query');
-  return (meta.sheets || []).filter(s => !s.hidden);
+  const sheets = (meta.sheets || []).filter(s => !s.hidden);
+  sheetListCache.set(spToken, sheets);
+  return sheets;
 }
 
 async function dumpWorksheet(lines, sp, sh) {
@@ -485,6 +500,49 @@ async function fetchRawDoc(objToken) {
   return d.content || '';
 }
 
+function fmtBitableField(v) {
+  if (v === null || v === undefined) return '';
+  if (Array.isArray(v)) return v.map(fmtBitableField).join('; ');
+  if (typeof v === 'object') {
+    if (typeof v.text === 'string' && v.text) return v.text;
+    return JSON.stringify(v);
+  }
+  return String(v);
+}
+
+async function renderBitable(appToken) {
+  const lines = [];
+  const tables = [];
+  let pt = '';
+  do {
+    let u = 'https://open.feishu.cn/open-apis/bitable/v1/apps/' + appToken + '/tables?page_size=100';
+    if (pt) u += '&page_token=' + pt;
+    const d = await api(u);
+    tables.push(...(d.items || []));
+    pt = d.has_more ? d.page_token : '';
+  } while (pt);
+  if (!tables.length) { lines.push('(无数据表)', ''); return lines.join('\n'); }
+  for (const t of tables) {
+    lines.push('## ' + t.name, '');
+    let rpt = '';
+    let count = 0;
+    do {
+      let u = 'https://open.feishu.cn/open-apis/bitable/v1/apps/' + appToken + '/tables/' + t.table_id + '/records?page_size=100';
+      if (rpt) u += '&page_token=' + rpt;
+      const d = await api(u);
+      for (const r of (d.items || [])) {
+        count++;
+        const parts = Object.entries(r.fields || {}).map(([k, v]) => k + ': ' + fmtBitableField(v));
+        lines.push('- ' + parts.join(' | '));
+      }
+      rpt = d.has_more ? d.page_token : '';
+    } while (rpt);
+    if (!count) lines.push('(空表)', '');
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
 async function exportNode(node, dirPath) {
   stats.total++;
   const safeName = sanitize(node.title);
@@ -508,8 +566,23 @@ async function exportNode(node, dirPath) {
       const md = await renderSpreadsheet(node.obj_token);
       fs.writeFileSync(mdFile, '<!-- 来源: ' + url + ' -->\n# ' + node.title + '\n\n' + md + '\n', 'utf8');
       stats.ok++;
+    } else if (node.obj_type === 'file') {
+      const res = await authFetch('https://open.feishu.cn/open-apis/drive/v1/files/' + node.obj_token + '/download');
+      if (res.status !== 200) throw new Error('file download http ' + res.status);
+      const buf = Buffer.from(await res.arrayBuffer());
+      const fname = safeName || ('file_' + node.obj_token);
+      fs.writeFileSync(path.join(nodeDir, fname), buf);
+      fs.writeFileSync(mdFile, '<!-- 来源: ' + url + ' -->\n# ' + node.title + '\n\n已下载到本地：[`' + fname + '`](' + encodeURI(fname) + ')\n', 'utf8');
+      stats.ok++;
+    } else if (node.obj_type === 'bitable') {
+      const md = await renderBitable(node.obj_token);
+      fs.writeFileSync(mdFile, '<!-- 来源: ' + url + ' -->\n# ' + node.title + '\n\n' + md + '\n', 'utf8');
+      stats.ok++;
     } else {
-      fs.writeFileSync(mdFile, '<!-- 来源: ' + url + ' -->\n# ' + node.title + '\n\n> [暂不支持导出该类型: ' + node.obj_type + ']\n', 'utf8');
+      const note = node.obj_type === 'mindnote'
+        ? '> [mindnote（思维笔记）：飞书开放 API 不支持导出，请在飞书中查看原始内容]'
+        : '> [暂不支持导出该类型: ' + node.obj_type + ']';
+      fs.writeFileSync(mdFile, '<!-- 来源: ' + url + ' -->\n# ' + node.title + '\n\n' + note + '\n', 'utf8');
       stats.warnings++;
     }
   } catch (e) {

@@ -1,0 +1,10 @@
+{
+  "skill": "tapd-create-guard",
+  "protected": true,
+  "owner": "skill 作者（导出者）",
+  "scheme": "sha256",
+  "password_sha256": "66e52fa9061472674466cdec63bfec6afe1417989e2e3f1e163b71e1b13f5f18",
+  "note_zh": "本 skill 受更新保护。任何修改（改 SKILL.md、改/增/删 scripts 或 _guard 下文件、改名、用新版本覆盖）之前，必须先通过 verify.py 校验更新密码；未通过不得修改。",
+  "note_en": "This skill is update-protected. Any modification requires the update password via verify.py first.",
+  "created": "2026-10-13"
+}

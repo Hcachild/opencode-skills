@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-11-17
+
+### Added
+- `caveman` / `megacave` / `ultracave` — 三档极简回复模式（英语电报体 / 文言文 / 最大压缩），回答保留全部技术事实
+- `gitea-pr-merge` — 在 by_code_base 的 Gitea 上以指定账号合并或关闭 PR：容器内 CLI 铸造短期 scoped token → 本地 API 操作 → 撤销 token 并清理痕迹
+- `tapd-create-guard` — TAPD 创建工作项（Epic/Feature/Story/Task/Bug）前的必填字段强制校验与创建回执，任一必填缺失即中止，禁止先建后补
+- `windows-screenshot` — Windows 截图统一入口：全屏 / 窗口（含遮挡、最小化）/ 区域 / 网页整页 / 元素裁剪 / 标注合成 / 复制到剪贴板
+- `feishu-wiki-module-docs` — 飞书 Wiki 模块文档构建与维护（docx block API、Mermaid 文本绘图、表格限制、图片上传、bitable 记录与视图排序）
+
+### Changed
+- Updated `code-review-score` — 新增可选「评审驱动快速修复」：低风险且范围明确的问题可修复并复检一次；安全、公共契约、架构类问题仍然只报告
+- Updated `tapd-work-recording` — 补充任务 owner 批量改派（账号切换）、Python 直连备用通道、工时增添与对账流程，以及昵称/KEY 轮换踩坑
+- Updated `feishu-common` — 支持 `FEISHU_APP` 多应用 profile，token 缓存按 app_id 隔离，避免跨应用串用 token
+- Updated `feishu-wiki-export` — 支持 bitable 与附件型 file 节点导出，内嵌 sheet 仅导出被引用的工作表，补充多应用切换说明
+- Updated `microsoft-foundry` — 新增 managed harness agent 与 voice agent 的创建/部署/冒烟测试文档及脚本
+- Regenerated README index (163 skills); `github-cn-access` 补入索引
+- Kept credentials sanitized (placeholders only); `skills/memory/` runtime token cache remains gitignored
+
 ## [1.9.3] - 2026-10-31
 
 ### Changed

@@ -1,56 +1,114 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const TOKEN_CACHE_FILE = path.resolve(__dirname, '../memory/feishu_token.json');
 
 let tokenCache = {
   token: null,
-  expireTime: 0
+  expireTime: 0,
+  appId: null
 };
 
+// FEISHU_APP=<name> selects config.<name>.json (default: config.json).
+function profileName() {
+  const raw = (process.env.FEISHU_APP || '').trim();
+  if (!raw) return '';
+  if (!/^[A-Za-z0-9_-]+$/.test(raw)) {
+    throw new Error('Invalid FEISHU_APP name (letters/digits/-/_ allowed): ' + raw);
+  }
+  return raw;
+}
+
+function configFileNames() {
+  const p = profileName();
+  return p ? ['config.' + p + '.json'] : ['config.json'];
+}
+
+function configCandidates() {
+  const names = configFileNames();
+  const roots = [
+    path.resolve(__dirname, '..'),
+    path.join(os.homedir(), '.agents', 'skills'),
+    path.join(os.homedir(), '.config', 'opencode', 'skills')
+  ];
+  const seen = new Set();
+  const out = [];
+  const push = p => { if (!seen.has(p)) { seen.add(p); out.push(p); } };
+  for (const name of names) {
+    push(path.join(__dirname, '..', name));
+    for (const root of roots) {
+      push(path.join(root, name));
+      let entries = [];
+      try { entries = fs.readdirSync(root, { withFileTypes: true }); } catch (e) {}
+      for (const ent of entries) {
+        if (ent.isDirectory() && ent.name.startsWith('feishu-')) {
+          push(path.join(root, ent.name, name));
+        }
+      }
+    }
+  }
+  return out;
+}
+
 function loadConfig() {
-  const configPath = path.join(__dirname, '../config.json');
-  let config = {};
-  if (fs.existsSync(configPath)) {
-    try {
-      config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    } catch (e) {
-      console.error("Failed to parse config.json");
+  if (process.env.FEISHU_APP_ID && process.env.FEISHU_APP_SECRET) {
+    return { app_id: process.env.FEISHU_APP_ID, app_secret: process.env.FEISHU_APP_SECRET };
+  }
+  for (const c of configCandidates()) {
+    let cfg;
+    try { cfg = JSON.parse(fs.readFileSync(c, 'utf8')); } catch (e) { continue; }
+    if (cfg && cfg.app_id && cfg.app_secret) {
+      return { app_id: cfg.app_id, app_secret: cfg.app_secret };
     }
   }
   return {
-    app_id: process.env.FEISHU_APP_ID || config.app_id,
-    app_secret: process.env.FEISHU_APP_SECRET || config.app_secret
+    app_id: process.env.FEISHU_APP_ID,
+    app_secret: process.env.FEISHU_APP_SECRET
   };
+}
+
+function readDiskToken(appId) {
+  try {
+    if (!fs.existsSync(TOKEN_CACHE_FILE)) return null;
+    const saved = JSON.parse(fs.readFileSync(TOKEN_CACHE_FILE, 'utf8'));
+    const expiry = saved.expire || saved.expireTime;
+    const now = Math.floor(Date.now() / 1000);
+    // Cache is bound to an app; never reuse another app's token.
+    if (saved.token && expiry > now && saved.app_id === appId) {
+      return { token: saved.token, expireTime: expiry };
+    }
+  } catch (e) {}
+  return null;
 }
 
 async function getTenantAccessToken(forceRefresh = false) {
   const now = Math.floor(Date.now() / 1000);
-
-  if (!forceRefresh && !tokenCache.token && fs.existsSync(TOKEN_CACHE_FILE)) {
-    try {
-      const saved = JSON.parse(fs.readFileSync(TOKEN_CACHE_FILE, 'utf8'));
-      const expiry = saved.expire || saved.expireTime;
-      if (saved.token && expiry > now) {
-        tokenCache.token = saved.token;
-        tokenCache.expireTime = expiry;
-      }
-    } catch (e) {}
-  }
+  const config = loadConfig();
 
   if (forceRefresh) {
     tokenCache.token = null;
     tokenCache.expireTime = 0;
-    try { if (fs.existsSync(TOKEN_CACHE_FILE)) fs.unlinkSync(TOKEN_CACHE_FILE); } catch(e) {}
+    tokenCache.appId = null;
+    try { if (fs.existsSync(TOKEN_CACHE_FILE)) fs.unlinkSync(TOKEN_CACHE_FILE); } catch (e) {}
+  } else {
+    if (tokenCache.token && tokenCache.expireTime > now && tokenCache.appId === config.app_id) {
+      return tokenCache.token;
+    }
+    const cached = readDiskToken(config.app_id);
+    if (cached) {
+      tokenCache.token = cached.token;
+      tokenCache.expireTime = cached.expireTime;
+      tokenCache.appId = config.app_id;
+      return tokenCache.token;
+    }
+    tokenCache.token = null;
+    tokenCache.expireTime = 0;
+    tokenCache.appId = null;
   }
 
-  if (tokenCache.token && tokenCache.expireTime > now) {
-    return tokenCache.token;
-  }
-
-  const config = loadConfig();
   if (!config.app_id || !config.app_secret) {
-    throw new Error("Missing app_id or app_secret. Set FEISHU_APP_ID and FEISHU_APP_SECRET env vars or config.json.");
+    throw new Error("Missing app_id or app_secret. Set FEISHU_APP_ID and FEISHU_APP_SECRET env vars or create config[.<FEISHU_APP>].json (e.g. ~/.agents/skills/config.json).");
   }
 
   let lastError;
@@ -71,13 +129,15 @@ async function getTenantAccessToken(forceRefresh = false) {
 
       tokenCache.token = data.tenant_access_token;
       tokenCache.expireTime = now + data.expire - 60;
+      tokenCache.appId = config.app_id;
 
       try {
         const cacheDir = path.dirname(TOKEN_CACHE_FILE);
         if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
         fs.writeFileSync(TOKEN_CACHE_FILE, JSON.stringify({
           token: tokenCache.token,
-          expire: tokenCache.expireTime
+          expire: tokenCache.expireTime,
+          app_id: config.app_id
         }, null, 2));
       } catch (e) {
         console.error("Failed to save token cache:", e.message);

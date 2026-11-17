@@ -9,7 +9,7 @@ description: >-
 
 # Code Review Score
 
-Review a PR or branch along **Standards** and **Spec**, then **score** and recommend merge. Do not rewrite the change unless the user asks.
+Review a PR or branch along **Standards** and **Spec**, then **score** and recommend merge. Do not rewrite the change unless the user asks or the optional quick-fix policy below applies.
 
 ## Inputs
 
@@ -102,6 +102,34 @@ Merge call (pick one):
 - **Request changes** — fix listed medium/high before merge
 - **Merge now + follow-up** — only if user needs urgency and risk is display/docs-only, not core path
 
+### 6. Optional review-driven quick fix
+
+If the review finds an in-scope issue that is quick, low-risk, and clearly correct, you may fix it and re-review once instead of only reporting it.
+
+Good candidates:
+
+- Missing or incorrect test for an already-defined contract
+- Comment / doc / naming mismatch
+- Small validation or boundary guard with obvious semantics
+- Clear duplication that can be removed without changing behavior
+
+Do **not** auto-fix when the issue involves:
+
+- Security or authorization semantics
+- Changes to public contracts, state, persistence, or runtime behavior with non-obvious effects
+- Architecture changes, broad refactors, or unclear intent
+- Anything where the correct behavior is not already fixed by the spec
+
+Quick-fix loop:
+
+1. Keep the fix in scope; do not bundle unrelated cleanup.
+2. Run the smallest relevant tests plus typecheck/lint.
+3. Re-read the changed diff against the same spec/standards.
+4. Report the original finding, the fix, and the re-review result; give the final score separately.
+5. Do not commit, push, approve, or merge unless the user asks.
+
+This step is optional: if the issue is not safely fixable in a short loop, leave it as a finding.
+
 ## Output format
 
 ```markdown
@@ -138,6 +166,11 @@ Merge call (pick one):
 ## 验证
 - 跑过的命令与结果
 - CI 状态
+
+## 快速修复与复检（如执行）
+- 修复项：…
+- 复检结果：…
+- 最终评分/合并建议：…
 ```
 
 Keep the response pointed: lead with score + merge call; details after. Prefer tables for findings.
@@ -147,5 +180,6 @@ Keep the response pointed: lead with score + merge call; details after. Prefer t
 - Read real diffs/tests; do not review from PR description alone
 - Separate **in-scope** vs **out-of-scope** against the larger PRD
 - Do not treat diagnostics/UI-only PRs as missing whole runtime systems unless the PR claims them
+- Quick fixes are optional, never mandatory; prefer reporting over guessing when the correct behavior is unclear
 - Do not auto-commit, push, or approve the GitHub PR unless the user asks
 - Never paste secrets from configs into the review
